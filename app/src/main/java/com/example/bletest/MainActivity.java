@@ -12,10 +12,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleScanCallback;
 import com.clj.fastble.data.BleDevice;
+import com.clj.fastble.scan.BleScanRuleConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,14 +40,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btn_scan = (Button) findViewById(R.id.btn_scan);
-        btn_scan.setText("开始扫描");
-        btn_scan.setOnClickListener(this);
-
-
-
-
-
         // BLE 初始化及配置
         BleManager.getInstance().init(getApplication());
         BleManager.getInstance()
@@ -52,6 +47,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setReConnectCount(1, 5000)
                 .setConnectOverTime(20000)
                 .setOperateTimeout(5000);
+
+        btn_scan = (Button) findViewById(R.id.btn_scan);
+        btn_scan.setText("开始扫描");
+        btn_scan.setOnClickListener(this);
+
+        mDeviceAdapter = new DeviceAdapter(this);
+        ListView listViewDevice = (ListView) findViewById(R.id.ble_device_list);
+        listViewDevice.setAdapter(mDeviceAdapter);
     }
 
     @Override
@@ -75,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_scan:
                 if (btn_scan.getText().equals("开始扫描")) {
                     checkPermissions();
+                    setBleScanRule();
+                    startBleScan();
                 } else if (btn_scan.getText().equals("停止扫描")) {
                     BleManager.getInstance().cancelScan();
                 }
@@ -111,6 +116,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showConnectedDevice() {
+        List<BleDevice> deviceList = BleManager.getInstance().getAllConnectedDevice();
+        mDeviceAdapter.clearConnectedDevice();
+        for (BleDevice bleDevice : deviceList) {
+            mDeviceAdapter.addDevice(bleDevice);
+        }
+        mDeviceAdapter.notifyDataSetChanged();
     }
 
     private void checkPermissions() {
@@ -139,13 +150,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             permissionList.add(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
+        }/*
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }*/
         if (!permissionList.isEmpty()) {
             String [] permissions = permissionList.toArray(new String[permissionList.size()]);
             ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
         }
     }
 
+    private void setBleScanRule() {
 
+        BleScanRuleConfig scanRuleConfig = new BleScanRuleConfig.Builder()
+             //   .setServiceUuids(null)
+             //   .setDeviceName(false, null)
+             //   .setDeviceMac(null)
+                .setAutoConnect(false)
+                .setScanTimeOut(10000)
+                .build();
+        BleManager.getInstance().initScanRule(scanRuleConfig);
+    }
+
+    private void startBleScan() {
+        BleManager.getInstance().scan(new BleScanCallback() {
+            @Override
+            public void onScanStarted(boolean success) {
+                mDeviceAdapter.clearScanDevice();
+                mDeviceAdapter.notifyDataSetChanged();
+                btn_scan.setText("停止扫描");
+            }
+
+            @Override
+            public void onLeScan(BleDevice bleDevice) {
+                super.onLeScan(bleDevice);
+            }
+
+            @Override
+            public void onScanning(BleDevice bleDevice) {
+                mDeviceAdapter.addDevice(bleDevice);
+                mDeviceAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onScanFinished(List<BleDevice> scanResultList) {
+                btn_scan.setText("开始扫描");
+            }
+        });
+    }
 
 }
