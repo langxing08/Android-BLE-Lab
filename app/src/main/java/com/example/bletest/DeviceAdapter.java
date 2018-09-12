@@ -134,6 +134,33 @@ public class DeviceAdapter extends BaseAdapter{
             }
         }
 
+        holder.btn_connect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mListener != null) {
+                    mListener.onConnect(bleDevice);
+                }
+            }
+        });
+
+        holder.btn_disconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mListener != null) {
+                    mListener.onDisConnect(bleDevice);
+                }
+            }
+        });
+
+        holder.btn_detail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mListener != null) {
+                    mListener.onDetail(bleDevice);
+                }
+            }
+        });
+
         return view;
     }
 

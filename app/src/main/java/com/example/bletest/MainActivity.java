@@ -2,6 +2,8 @@ package com.example.bletest;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothGatt;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -16,8 +18,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleGattCallback;
 import com.clj.fastble.callback.BleScanCallback;
 import com.clj.fastble.data.BleDevice;
+import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 
 import java.util.ArrayList;
@@ -53,6 +57,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_scan.setOnClickListener(this);
 
         mDeviceAdapter = new DeviceAdapter(this);
+        mDeviceAdapter.setOnDeviceClickListener(new DeviceAdapter.OnDeviceClickListener() {
+            @Override
+            public void onConnect(BleDevice bleDevice) {
+                if (!BleManager.getInstance().isConnected(bleDevice)) {
+                    BleManager.getInstance().cancelScan();
+                    connect(bleDevice);
+                }
+            }
+
+            @Override
+            public void onDisConnect(BleDevice bleDevice) {
+                if (BleManager.getInstance().isConnected(bleDevice)) {
+                    BleManager.getInstance().disconnect(bleDevice);
+                }
+            }
+
+            @Override
+            public void onDetail(BleDevice bleDevice) {
+                if (BleManager.getInstance().isConnected(bleDevice)) {
+                    Intent intent = new Intent(MainActivity.this, OperationActivity.class);
+                //    intent.putExtra(OperationActivity.KEY_DATA, bleDevice);
+                //    startActivity(intent);
+                }
+            }
+        });
         ListView listViewDevice = (ListView) findViewById(R.id.ble_device_list);
         listViewDevice.setAdapter(mDeviceAdapter);
     }
@@ -197,6 +226,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
                 btn_scan.setText("开始扫描");
+            }
+        });
+    }
+
+    private void connect(final BleDevice bleDevice) {
+        BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
+            @Override
+            public void onStartConnect() {
+
+            }
+
+            @Override
+            public void onConnectFail(BleDevice bleDevice, BleException exception) {
+                btn_scan.setText("开始扫描");
+                Toast.makeText(MainActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                mDeviceAdapter.addDevice(bleDevice);
+                mDeviceAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onDisConnected(boolean isActiveDisConnected, BleDevice device, BluetoothGatt gatt, int status) {
+                mDeviceAdapter.removeDevice(bleDevice);
+                mDeviceAdapter.notifyDataSetChanged();
+
+                if (isActiveDisConnected) {
+                    Toast.makeText(MainActivity.this, "断开了", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "连接断开", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
