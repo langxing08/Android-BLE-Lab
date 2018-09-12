@@ -108,7 +108,13 @@ public class DeviceAdapter extends BaseAdapter{
             String mac = bleDevice.getMac();
             int rssi = bleDevice.getRssi();
 
-            holder.txt_name.setText(name);
+            // 设备名称为空时, 强制将设备名称设置为N/A
+            if ((name == null) || (name.length() == 0)) {
+                holder.txt_name.setText("N/A");
+            } else {
+                holder.txt_name.setText(name);
+            }
+
             holder.txt_mac.setText(mac);
             holder.txt_rssi.setText(String.valueOf(rssi));
             if (isConnected) {
