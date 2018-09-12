@@ -4,7 +4,9 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.clj.fastble.BleManager;
@@ -91,6 +93,12 @@ public class DeviceAdapter extends BaseAdapter{
             holder.img_blue = (ImageView) view.findViewById(R.id.img_blue);
             holder.txt_name = (TextView) view.findViewById(R.id.txt_name);
             holder.txt_mac = (TextView) view.findViewById(R.id.txt_mac);
+            holder.txt_rssi = (TextView) view.findViewById(R.id.txt_rssi);
+            holder.layout_idle = (LinearLayout) view.findViewById(R.id.layout_idle);
+            holder.layout_connected = (LinearLayout) view.findViewById(R.id.layout_connected);
+            holder.btn_connect = (Button) view.findViewById(R.id.btn_connect);
+            holder.btn_disconnect = (Button) view.findViewById(R.id.btn_disconnect);
+            holder.btn_detail = (Button) view.findViewById(R.id.btn_detail);
         }
 
         final BleDevice bleDevice = getItem(position);
@@ -98,15 +106,25 @@ public class DeviceAdapter extends BaseAdapter{
             boolean isConnected = BleManager.getInstance().isConnected(bleDevice);
             String name = bleDevice.getName();
             String mac = bleDevice.getMac();
-        //    int rssi = bleDevice.getRssi();
+            int rssi = bleDevice.getRssi();
+
             holder.txt_name.setText(name);
             holder.txt_mac.setText(mac);
-        //    holder.txt_rssi.setText(String.valueOf(rssi));
+            holder.txt_rssi.setText(String.valueOf(rssi));
             if (isConnected) {
                 holder.img_blue.setImageResource(R.mipmap.ic_blue_connected);
+                holder.txt_name.setTextColor(0xFF1dE9B6);
+                holder.txt_mac.setTextColor(0xFF1dE9B6);
 
+                holder.layout_idle.setVisibility(View.GONE);
+                holder.layout_connected.setVisibility(View.VISIBLE);
             } else {
                 holder.img_blue.setImageResource(R.mipmap.ic_blue_remote);
+                holder.txt_name.setTextColor(0xFF000000);
+                holder.txt_mac.setTextColor(0xFF000000);
+
+                holder.layout_idle.setVisibility(View.VISIBLE);
+                holder.layout_connected.setVisibility(View.GONE);
             }
         }
 
@@ -115,9 +133,17 @@ public class DeviceAdapter extends BaseAdapter{
 
     class ViewHolder {
         ImageView img_blue;
+
         TextView txt_name;
         TextView txt_mac;
         TextView txt_rssi;
+
+        LinearLayout layout_idle;
+        LinearLayout layout_connected;
+
+        Button btn_disconnect;
+        Button btn_connect;
+        Button btn_detail;
     }
 
     public interface OnDeviceClickListener {
