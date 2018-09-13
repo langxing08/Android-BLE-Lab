@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">BleTest</string>
+    <string name="service">服务</string>
+    <string name="type">服务类型(主服务)</string>
 </resources>

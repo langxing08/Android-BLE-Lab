@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onConnect(BleDevice bleDevice) {
                 if (!BleManager.getInstance().isConnected(bleDevice)) {
                     BleManager.getInstance().cancelScan();
-                    connect(bleDevice);
+                    bleConnect(bleDevice);
                 }
             }
 
@@ -77,12 +77,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDetail(BleDevice bleDevice) {
                 if (BleManager.getInstance().isConnected(bleDevice)) {
                     Intent intent = new Intent(MainActivity.this, OperationActivity.class);
-                //    intent.putExtra(OperationActivity.KEY_DATA, bleDevice);
-                //    startActivity(intent);
+                    intent.putExtra(OperationActivity.KEY_DATA, bleDevice);
+                    startActivity(intent);
                 }
             }
         });
-        ListView listViewDevice = (ListView) findViewById(R.id.ble_device_list);
+        ListView listViewDevice = (ListView) findViewById(R.id.list_ble_device);
         listViewDevice.setAdapter(mDeviceAdapter);
     }
 
@@ -107,8 +107,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_scan:
                 if (btn_scan.getText().equals("开始扫描")) {
                     checkPermissions();
-                    setBleScanRule();
-                    startBleScan();
+                    bleSetScanRule();
+                    bleStartScan();
                 } else if (btn_scan.getText().equals("停止扫描")) {
                     BleManager.getInstance().cancelScan();
                 }
@@ -191,8 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void setBleScanRule() {
-
+    private void bleSetScanRule() {
         BleScanRuleConfig scanRuleConfig = new BleScanRuleConfig.Builder()
              //   .setServiceUuids(null)
              //   .setDeviceName(false, null)
@@ -203,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BleManager.getInstance().initScanRule(scanRuleConfig);
     }
 
-    private void startBleScan() {
+    private void bleStartScan() {
         BleManager.getInstance().scan(new BleScanCallback() {
             @Override
             public void onScanStarted(boolean success) {
@@ -230,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private void connect(final BleDevice bleDevice) {
+    private void bleConnect(final BleDevice bleDevice) {
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
             public void onStartConnect() {

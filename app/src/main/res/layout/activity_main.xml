@@ -10,10 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAllCaps="false"
-        android:text="Scan Ble Device" />
+        android:text="开始扫描" />
 
     <ListView
-        android:id="@+id/ble_device_list"
+        android:id="@+id/list_ble_device"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
