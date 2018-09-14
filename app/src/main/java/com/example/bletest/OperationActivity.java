@@ -63,8 +63,8 @@ public class OperationActivity extends AppCompatActivity {
     private void initView() {
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(titles[0]);
-    //    setSupportActionBar(toolbar);
-    //    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void initPage() {
