@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setReConnectCount(1, 5000)
                 .setConnectOverTime(20000)
                 .setOperateTimeout(5000);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_device);
+        setSupportActionBar(toolbar);
 
         btn_scan = (Button) findViewById(R.id.btn_scan);
         btn_scan.setText("开始扫描");
