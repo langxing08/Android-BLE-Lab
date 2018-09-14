@@ -7,7 +7,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toolbar;
 
+import com.clj.fastble.BleManager;
 import com.clj.fastble.data.BleDevice;
 
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ public class OperationActivity extends AppCompatActivity {
     private BluetoothGattCharacteristic bluetoothGattCharacteristic;
     private int charaProp;
 
+    private android.support.v7.widget.Toolbar toolbar;
     private List<Fragment> fragmentList = new ArrayList<>();
     private int currentPage = 0;
     private String[] titles = new String[3];
@@ -39,6 +42,15 @@ public class OperationActivity extends AppCompatActivity {
         initPage();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        BleManager.getInstance().clearCharacterCallback(bleDevice);
+    }
+
+
+
     private void initData() {
         bleDevice = getIntent().getParcelableExtra(KEY_DATA);
         if (bleDevice == null) {
@@ -49,7 +61,10 @@ public class OperationActivity extends AppCompatActivity {
     }
 
     private void initView() {
-
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(titles[0]);
+    //    setSupportActionBar(toolbar);
+    //    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void initPage() {
@@ -59,6 +74,7 @@ public class OperationActivity extends AppCompatActivity {
 
     public void changePage(int page) {
         currentPage = page;
+        toolbar.setTitle(titles[page]);
 
         updateFragment(page);
     }

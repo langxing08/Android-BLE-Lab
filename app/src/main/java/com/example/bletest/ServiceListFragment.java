@@ -66,8 +66,8 @@ public class ServiceListFragment extends Fragment {
 
         BluetoothGatt gatt = BleManager.getInstance().getBluetoothGatt(bleDevice);
 
-        txtServiceName.setText("设备广播名: " + name);
-        txtServiceMac.setText("MAC: " + mac);
+        txtServiceName.setText(String.valueOf("设备广播名: " + name));
+        txtServiceMac.setText(String.valueOf("MAC: " + mac));
 
         mResultAdapter.clear();
         for (BluetoothGattService service : gatt.getServices()) {
