@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Toolbar;
 
 import com.clj.fastble.BleManager;
@@ -49,7 +51,38 @@ public class OperationActivity extends AppCompatActivity {
         BleManager.getInstance().clearCharacterCallback(bleDevice);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (currentPage != 0) {
+                currentPage--;
+                changePage(currentPage);
+                return true;
+            } else {
+                finish();
+                return true;
+            }
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
+    private void initView() {
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(titles[0]);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentPage != 0) {
+                    currentPage--;
+                    changePage(currentPage);
+                } else {
+                    finish();
+                }
+            }
+        });
+    }
 
     private void initData() {
         bleDevice = getIntent().getParcelableExtra(KEY_DATA);
@@ -60,12 +93,7 @@ public class OperationActivity extends AppCompatActivity {
         titles = new String[] {"服务列表","特征值列表","操作控制台"};
     }
 
-    private void initView() {
-        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(titles[0]);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
+
 
     private void initPage() {
         prepareFragment();
@@ -77,10 +105,17 @@ public class OperationActivity extends AppCompatActivity {
         toolbar.setTitle(titles[page]);
 
         updateFragment(page);
+
+        if (currentPage == 1) {
+            ((CharacteristicListFragment) fragmentList.get(1)).showData();
+        } else if (currentPage == 2) {
+
+        }
     }
 
     private void prepareFragment() {
         fragmentList.add(new ServiceListFragment());
+        fragmentList.add(new CharacteristicListFragment());
 
         for (Fragment fragment : fragmentList) {
             getSupportFragmentManager()
