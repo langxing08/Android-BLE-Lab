@@ -90,7 +90,8 @@ public class CharacteristicOperationFragment extends Fragment {
                                             runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    addText(txt, HexUtil.formatHexString(data, true));
+                                                    addText(txt, HexUtil.formatHexString(data, true));  // HEX Display
+                                                    addText(txt, new String(data)); // ASCII Display
                                                 }
                                             });
                                         }
