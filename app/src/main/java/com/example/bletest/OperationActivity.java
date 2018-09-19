@@ -109,13 +109,14 @@ public class OperationActivity extends AppCompatActivity {
         if (currentPage == 1) {
             ((CharacteristicListFragment) fragmentList.get(1)).showData();
         } else if (currentPage == 2) {
-
+            ((CharacteristicOperationFragment) fragmentList.get(2)).showData();
         }
     }
 
     private void prepareFragment() {
         fragmentList.add(new ServiceListFragment());
         fragmentList.add(new CharacteristicListFragment());
+        fragmentList.add(new CharacteristicOperationFragment());
 
         for (Fragment fragment : fragmentList) {
             getSupportFragmentManager()
