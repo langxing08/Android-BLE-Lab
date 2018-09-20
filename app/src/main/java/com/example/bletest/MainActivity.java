@@ -1,20 +1,28 @@
 package com.example.bletest;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
-import android.os.Build;
+import android.location.LocationManager;
+import android.support.annotation.AnimatorRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,6 +32,9 @@ import com.clj.fastble.callback.BleScanCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
+import com.example.bletest.adapter.DeviceAdapter;
+import com.example.bletest.comm.ObserverManager;
+import com.example.bletest.operation.OperationActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +48,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private Button btn_scan;
+    private ImageView img_loading;
 
+    private Animation operatingAnim;
     private DeviceAdapter mDeviceAdapter;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        initView();
 
         // BLE 初始化及配置
         BleManager.getInstance().init(getApplication());
@@ -52,42 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setReConnectCount(1, 5000)
                 .setConnectOverTime(20000)
                 .setOperateTimeout(5000);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_device);
-        setSupportActionBar(toolbar);
-
-        btn_scan = (Button) findViewById(R.id.btn_scan);
-        btn_scan.setText("开始扫描");
-        btn_scan.setOnClickListener(this);
-
-        mDeviceAdapter = new DeviceAdapter(this);
-        mDeviceAdapter.setOnDeviceClickListener(new DeviceAdapter.OnDeviceClickListener() {
-            @Override
-            public void onConnect(BleDevice bleDevice) {
-                if (!BleManager.getInstance().isConnected(bleDevice)) {
-                    BleManager.getInstance().cancelScan();
-                    bleConnect(bleDevice);
-                }
-            }
-
-            @Override
-            public void onDisConnect(BleDevice bleDevice) {
-                if (BleManager.getInstance().isConnected(bleDevice)) {
-                    BleManager.getInstance().disconnect(bleDevice);
-                }
-            }
-
-            @Override
-            public void onDetail(BleDevice bleDevice) {
-                if (BleManager.getInstance().isConnected(bleDevice)) {
-                    Intent intent = new Intent(MainActivity.this, OperationActivity.class);
-                    intent.putExtra(OperationActivity.KEY_DATA, bleDevice);
-                    startActivity(intent);
-                }
-            }
-        });
-        ListView listViewDevice = (ListView) findViewById(R.id.list_ble_device);
-        listViewDevice.setAdapter(mDeviceAdapter);
     }
 
     @Override
@@ -109,11 +89,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_scan:
-                if (btn_scan.getText().equals("开始扫描")) {
+                if (btn_scan.getText().equals(getString(R.string.start_scan))) { // 开始扫描
                     checkPermissions();
                     bleSetScanRule();
                     bleStartScan();
-                } else if (btn_scan.getText().equals("停止扫描")) {
+                } else if (btn_scan.getText().equals(getString(R.string.stop_scan))) { // 停止扫描
                     BleManager.getInstance().cancelScan();
                 }
                 break;
@@ -145,7 +125,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initView() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_device);
+        setSupportActionBar(toolbar);
 
+        btn_scan = (Button) findViewById(R.id.btn_scan);
+        btn_scan.setText(getString(R.string.start_scan));
+        btn_scan.setOnClickListener(this);
+
+        img_loading = (ImageView) findViewById(R.id.img_loading);
+        operatingAnim = AnimationUtils.loadAnimation(this, R.anim.rotate);
+        operatingAnim.setInterpolator(new LinearInterpolator());
+        progressDialog = new ProgressDialog(this);
+
+        mDeviceAdapter = new DeviceAdapter(this);
+        mDeviceAdapter.setOnDeviceClickListener(new DeviceAdapter.OnDeviceClickListener() {
+            @Override
+            public void onConnect(BleDevice bleDevice) {
+                if (!BleManager.getInstance().isConnected(bleDevice)) {
+                    BleManager.getInstance().cancelScan();
+                    bleConnect(bleDevice);
+                }
+            }
+
+            @Override
+            public void onDisConnect(BleDevice bleDevice) {
+                if (BleManager.getInstance().isConnected(bleDevice)) {
+                    BleManager.getInstance().disconnect(bleDevice);
+                }
+            }
+
+            @Override
+            public void onDetail(BleDevice bleDevice) {
+                if (BleManager.getInstance().isConnected(bleDevice)) {
+                    Intent intent = new Intent(MainActivity.this, OperationActivity.class);
+                    intent.putExtra(OperationActivity.KEY_DATA, bleDevice);
+                    startActivity(intent);
+                }
+            }
+        });
+        ListView listViewDevice = (ListView) findViewById(R.id.list_ble_device);
+        listViewDevice.setAdapter(mDeviceAdapter);
     }
 
     private void showConnectedDevice() {
@@ -212,7 +231,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onScanStarted(boolean success) {
                 mDeviceAdapter.clearScanDevice();
                 mDeviceAdapter.notifyDataSetChanged();
-                btn_scan.setText("停止扫描");
+
+                img_loading.startAnimation(operatingAnim);
+                img_loading.setVisibility(View.VISIBLE);
+
+                btn_scan.setText(getString(R.string.stop_scan)); // 停止扫描
             }
 
             @Override
@@ -228,7 +251,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
-                btn_scan.setText("开始扫描");
+                img_loading.clearAnimation();
+                img_loading.setVisibility(View.INVISIBLE);
+
+                btn_scan.setText(getString(R.string.start_scan)); // 开始扫描
             }
         });
     }
@@ -237,23 +263,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
             public void onStartConnect() {
-
+                progressDialog.show();
             }
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                btn_scan.setText("开始扫描");
+                img_loading.clearAnimation();
+                img_loading.setVisibility(View.INVISIBLE);
+
+                btn_scan.setText(getString(R.string.start_scan)); // 开始扫描
+
+                progressDialog.dismiss();
+
                 Toast.makeText(MainActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+                progressDialog.dismiss();
+
                 mDeviceAdapter.addDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onDisConnected(boolean isActiveDisConnected, BleDevice device, BluetoothGatt gatt, int status) {
+                progressDialog.dismiss();
+
                 mDeviceAdapter.removeDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
 
@@ -261,9 +297,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.makeText(MainActivity.this, "断开了", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(MainActivity.this, "连接断开", Toast.LENGTH_SHORT).show();
+
+                    ObserverManager.getInstance().notifyObserver(bleDevice);
                 }
             }
         });
+    }
+
+    private boolean checkGpsIsOpen() {
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager == null) {
+            return false;
+        }
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_OPEN_GPS) {
+            if (checkGpsIsOpen()) {
+                bleSetScanRule();
+                bleStartScan();
+            }
+        }
     }
 
 }

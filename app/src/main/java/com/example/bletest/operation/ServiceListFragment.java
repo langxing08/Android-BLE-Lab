@@ -1,4 +1,4 @@
-package com.example.bletest;
+package com.example.bletest.operation;
 
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattService;
@@ -17,11 +17,11 @@ import android.widget.TextView;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.data.BleDevice;
+import com.example.bletest.R;
+import com.example.bletest.operation.OperationActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.transform.Result;
 
 public class ServiceListFragment extends Fragment {
 

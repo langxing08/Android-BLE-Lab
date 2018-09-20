@@ -1,4 +1,4 @@
-package com.example.bletest;
+package com.example.bletest.operation;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
@@ -17,6 +17,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.bletest.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +68,7 @@ public class CharacteristicListFragment extends Fragment{
 
                 if (propList.size() > 1) {
                     new AlertDialog.Builder(getActivity())
-                            .setTitle(getActivity().getString(R.string.select_operation_type))
+                            .setTitle(getActivity().getString(R.string.select_operation_type)) // 选择操作类型
                             .setItems(propNameList.toArray(new String[propNameList.size()]), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int which) {

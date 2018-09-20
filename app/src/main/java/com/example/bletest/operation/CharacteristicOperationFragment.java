@@ -1,4 +1,4 @@
-package com.example.bletest;
+package com.example.bletest.operation;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Bundle;
@@ -23,6 +23,7 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.utils.HexUtil;
+import com.example.bletest.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,8 @@ public class CharacteristicOperationFragment extends Fragment {
             layout_container.findViewWithTag(bleDevice.getKey() + characteristic.getUuid().toString() + charaProp)
                     .setVisibility(View.VISIBLE);
         } else {
+            childList.add(child);
+
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation, null);
             view.setTag(bleDevice.getKey() + characteristic.getUuid().toString() + charaProp);
             LinearLayout layoutAdd = (LinearLayout) view.findViewById(R.id.layout_add);
@@ -76,7 +79,7 @@ public class CharacteristicOperationFragment extends Fragment {
                 case PROPERTY_READ: {
                     View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_button, null);
                     Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText("读");
+                    btn.setText(getString(R.string.read)); // 读
                     btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -116,7 +119,7 @@ public class CharacteristicOperationFragment extends Fragment {
                     View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_et, null);
                     final EditText et = (EditText) viewAdd.findViewById(R.id.et);
                     Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText("写");
+                    btn.setText(getString(R.string.write)); // 写
                     btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -163,7 +166,7 @@ public class CharacteristicOperationFragment extends Fragment {
                     View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_et, null);
                     final EditText et = (EditText) viewAdd.findViewById(R.id.et);
                     Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText("写");
+                    btn.setText(getString(R.string.write)); // 写
                     btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -209,12 +212,12 @@ public class CharacteristicOperationFragment extends Fragment {
                 case PROPERTY_NOTIFY: {
                     View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_button, null);
                     final Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText("打开通知");
+                    btn.setText(getString(R.string.notify_enable)); // 打开通知
                     btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if (btn.getText().toString().equals("打开通知")) {
-                                btn.setText("关闭通知");
+                            if (btn.getText().toString().equals(getString(R.string.notify_enable))) { // 打开通知
+                                btn.setText(getString(R.string.notify_disable)); // 关闭通知
                                 BleManager.getInstance().notify(
                                         bleDevice,
                                         characteristic.getService().getUuid().toString(),
@@ -247,7 +250,7 @@ public class CharacteristicOperationFragment extends Fragment {
                                         }
                                 );
                             } else {
-                                btn.setText("打开通知");
+                                btn.setText(getString(R.string.notify_enable)); // 打开通知
                                 BleManager.getInstance().stopNotify(
                                         bleDevice,
                                         characteristic.getService().getUuid().toString(),
@@ -262,12 +265,12 @@ public class CharacteristicOperationFragment extends Fragment {
                 case PROPERTY_INDICATE: {
                     View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_button, null);
                     final Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText("打开指示");
+                    btn.setText(getString(R.string.indicate_enable)); // 打开指示
                     btn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                            if (btn.getText().toString().equals("打开指示")) {
-                                btn.setText("关闭指示");
+                            if (btn.getText().toString().equals(getString(R.string.indicate_enable))) { // 打开指示
+                                btn.setText(getString(R.string.indicate_disable)); // 关闭指示
                                 BleManager.getInstance().indicate(
                                         bleDevice,
                                         characteristic.getService().getUuid().toString(),
@@ -300,7 +303,7 @@ public class CharacteristicOperationFragment extends Fragment {
                                         }
                                 );
                             } else {
-                                btn.setText("打开指示");
+                                btn.setText(getString(R.string.indicate_enable)); // 打开指示
                                 BleManager.getInstance().stopIndicate(
                                         bleDevice,
                                         characteristic.getService().getUuid().toString(),

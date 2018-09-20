@@ -1,6 +1,5 @@
-package com.example.bletest;
+package com.example.bletest.operation;
 
-import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.support.v4.app.Fragment;
@@ -9,16 +8,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.Toolbar;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.data.BleDevice;
+import com.example.bletest.R;
+import com.example.bletest.comm.Observer;
+import com.example.bletest.comm.ObserverManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 
-public class OperationActivity extends AppCompatActivity {
+public class OperationActivity extends AppCompatActivity implements Observer {
 
     private static final String TAG = "OperationActivity";
 
@@ -42,6 +42,8 @@ public class OperationActivity extends AppCompatActivity {
         initData();
         initView();
         initPage();
+
+        ObserverManager.getInstance().addObserver(this);
     }
 
     @Override
@@ -49,6 +51,15 @@ public class OperationActivity extends AppCompatActivity {
         super.onDestroy();
 
         BleManager.getInstance().clearCharacterCallback(bleDevice);
+
+        ObserverManager.getInstance().deleteObserver(this);
+    }
+
+    @Override
+    public void disConnected(BleDevice device) {
+        if ((device != null) && (bleDevice != null) && (device.getKey().equals(bleDevice.getKey()))) {
+            finish();
+        }
     }
 
     @Override

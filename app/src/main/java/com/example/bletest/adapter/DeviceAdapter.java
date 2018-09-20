@@ -1,4 +1,4 @@
-package com.example.bletest;
+package com.example.bletest.adapter;
 
 import android.content.Context;
 import android.view.View;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.data.BleDevice;
+import com.example.bletest.R;
 
 import java.util.ArrayList;
 import java.util.List;
