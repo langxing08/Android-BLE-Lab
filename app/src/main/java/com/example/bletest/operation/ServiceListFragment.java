@@ -19,6 +19,7 @@ import com.clj.fastble.BleManager;
 import com.clj.fastble.data.BleDevice;
 import com.example.bletest.R;
 import com.example.bletest.operation.OperationActivity;
+import com.example.bletest.tool.SampleGattAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,10 +131,12 @@ public class ServiceListFragment extends Fragment {
 
             BluetoothGattService service = bluetoothGattServiceList.get(position);
             String uuid = service.getUuid().toString();
+            String type = String.valueOf(service.getType());
 
-            holder.txt_service_name.setText(String.valueOf(getActivity().getString(R.string.service) + "(" + position + ")"));
+            //holder.txt_service_name.setText(String.valueOf(getActivity().getString(R.string.service) + "(" + position + ")"));
+            holder.txt_service_name.setText(SampleGattAttributes.lookup(uuid, "Unknown"));
             holder.txt_service_uuid.setText(uuid);
-            holder.txt_service_type.setText(getActivity().getString(R.string.type));
+            holder.txt_service_type.setText(String.valueOf(getActivity().getString(R.string.type) + "(" + type + ")"));
 
             return view;
         }

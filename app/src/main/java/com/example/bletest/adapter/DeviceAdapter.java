@@ -118,6 +118,7 @@ public class DeviceAdapter extends BaseAdapter{
 
             holder.txt_mac.setText(mac);
             holder.txt_rssi.setText(String.valueOf(rssi));
+
             if (isConnected) {
                 holder.img_blue.setImageResource(R.mipmap.ic_blue_connected);
                 holder.txt_name.setTextColor(0xFF1dE9B6);
