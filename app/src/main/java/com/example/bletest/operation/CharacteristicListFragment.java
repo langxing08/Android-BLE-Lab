@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.bletest.R;
+import com.example.bletest.tool.SampleGattAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -152,7 +153,8 @@ public class CharacteristicListFragment extends Fragment{
             BluetoothGattCharacteristic characteristic = characteristicList.get(position);
             String uuid = characteristic.getUuid().toString();
 
-            holder.txt_char_name.setText(String.valueOf(getActivity().getString(R.string.characteristic) + "(" + position + ")"));
+            //holder.txt_char_name.setText(String.valueOf(getActivity().getString(R.string.characteristic) + "(" + position + ")"));
+            holder.txt_char_name.setText(SampleGattAttributes.lookup(uuid, "Unknown"));
             holder.txt_char_uuid.setText(uuid);
 
             StringBuilder property = new StringBuilder();
