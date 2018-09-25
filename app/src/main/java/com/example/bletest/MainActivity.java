@@ -17,6 +17,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -39,16 +42,21 @@ import com.example.bletest.operation.OperationActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
     private static final int REQUEST_CODE_OPEN_GPS = 1;
     private static final int REQUEST_CODE_PERMISSION_LOCATION = 2;
 
+    private static final int BLE_SCAN_STATUS = 1;
+    private static final int BLE_STOP_SCAN_STATUS = 0;
+    private int ble_scan_status = BLE_STOP_SCAN_STATUS;
 
-    private Button btn_scan;
+//    private Button btn_scan;
     private ImageView img_loading;
+
+    private MenuItem menuItem_scan;
 
     private Animation operatingAnim;
     private DeviceAdapter mDeviceAdapter;
@@ -85,21 +93,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         BleManager.getInstance().destroy();
     }
 
+
+//    @Override
+//    public void onClick(View view) {
+//        switch (view.getId()) {
+//            case R.id.btn_scan:
+//                /*
+//                if (btn_scan.getText().equals(getString(R.string.start_scan))) { // 开始扫描
+//                    checkPermissions();
+//                    bleSetScanRule();
+//                    bleStartScan();
+//                } else if (btn_scan.getText().equals(getString(R.string.stop_scan))) { // 停止扫描
+//                    BleManager.getInstance().cancelScan();
+//                }*/
+//
+//                if (ble_scan_status == BLE_STOP_SCAN_STATUS) { // 开始扫描
+//                    checkPermissions();
+//                    bleSetScanRule();
+//                    bleStartScan();
+//                } else if (ble_scan_status == BLE_SCAN_STATUS) { // 停止扫描
+//                    BleManager.getInstance().cancelScan();
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btn_scan:
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.device_toolbar, menu);
+        menuItem_scan = menu.findItem(R.id.action_scan);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_scan:
+
+                Toast.makeText(this, menuItem_scan.getTitle(), Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "onOptionsItemSelected: " + menuItem_scan.getTitle());
+
+                /*
                 if (btn_scan.getText().equals(getString(R.string.start_scan))) { // 开始扫描
                     checkPermissions();
                     bleSetScanRule();
                     bleStartScan();
                 } else if (btn_scan.getText().equals(getString(R.string.stop_scan))) { // 停止扫描
                     BleManager.getInstance().cancelScan();
+                }*/
+                if (ble_scan_status == BLE_STOP_SCAN_STATUS) { // 开始扫描
+                    checkPermissions();
+                    bleSetScanRule();
+                    bleStartScan();
+                } else if (ble_scan_status == BLE_SCAN_STATUS) { // 停止扫描
+                    BleManager.getInstance().cancelScan();
                 }
+                break;
+            case R.id.action_show_log:
+                Toast.makeText(this, "show log", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
         }
+        return true;
     }
 
     @Override
@@ -128,9 +186,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_device);
         setSupportActionBar(toolbar);
 
-        btn_scan = (Button) findViewById(R.id.btn_scan);
-        btn_scan.setText(getString(R.string.start_scan));
-        btn_scan.setOnClickListener(this);
+//        btn_scan = (Button) findViewById(R.id.btn_scan);
+//        btn_scan.setText(getString(R.string.start_scan));
+//        btn_scan.setOnClickListener(this);
 
         img_loading = (ImageView) findViewById(R.id.img_loading);
         operatingAnim = AnimationUtils.loadAnimation(this, R.anim.rotate);
@@ -235,7 +293,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 img_loading.startAnimation(operatingAnim);
                 img_loading.setVisibility(View.VISIBLE);
 
-                btn_scan.setText(getString(R.string.stop_scan)); // 停止扫描
+                ble_scan_status = BLE_SCAN_STATUS;
+//                btn_scan.setText(getString(R.string.stop_scan)); // 停止扫描
+                menuItem_scan.setTitle(getString(R.string.stop_scan));
             }
 
             @Override
@@ -254,7 +314,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 img_loading.clearAnimation();
                 img_loading.setVisibility(View.INVISIBLE);
 
-                btn_scan.setText(getString(R.string.start_scan)); // 开始扫描
+                ble_scan_status = BLE_STOP_SCAN_STATUS;
+//                btn_scan.setText(getString(R.string.start_scan)); // 开始扫描
+                menuItem_scan.setTitle(getString(R.string.start_scan));
             }
         });
     }
@@ -271,7 +333,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 img_loading.clearAnimation();
                 img_loading.setVisibility(View.INVISIBLE);
 
-                btn_scan.setText(getString(R.string.start_scan)); // 开始扫描
+                ble_scan_status = BLE_SCAN_STATUS;
+//                btn_scan.setText(getString(R.string.start_scan)); // 开始扫描
+                menuItem_scan.setTitle(getString(R.string.start_scan));
 
                 progressDialog.dismiss();
 
