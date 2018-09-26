@@ -16,31 +16,33 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:title="@string/app_name" />
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/device_scan_logo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:orientation="horizontal"
-        android:padding="10dp">
-
-        <Button
-            android:id="@+id/btn_scan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:textAllCaps="false"
-            android:text="@string/start_scan" />
+        android:padding="10dp"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/img_loading"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
+            android:layout_marginStart="10dp"
             android:src="@mipmap/ic_loading"
-            android:visibility="invisible" />
+            android:contentDescription="@string/device_scanning"/>
 
-    </RelativeLayout>
+        <TextView
+            android:id="@+id/txt_device_scanning"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:text="@string/device_scanning"
+            android:textStyle="bold"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
 
     <ListView
         android:id="@+id/list_ble_device"

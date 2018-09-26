@@ -26,6 +26,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -51,12 +52,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int BLE_SCAN_STATUS = 1;
     private static final int BLE_STOP_SCAN_STATUS = 0;
-    private int ble_scan_status = BLE_STOP_SCAN_STATUS;
+    private int bleScanStatus = BLE_STOP_SCAN_STATUS;
 
-//    private Button btn_scan;
-    private ImageView img_loading;
+    private LinearLayout deviceScanLogo;
+    private ImageView imgLoading;
 
-    private MenuItem menuItem_scan;
+    private MenuItem menuItemScan;
 
     private Animation operatingAnim;
     private DeviceAdapter mDeviceAdapter;
@@ -93,37 +94,10 @@ public class MainActivity extends AppCompatActivity {
         BleManager.getInstance().destroy();
     }
 
-
-//    @Override
-//    public void onClick(View view) {
-//        switch (view.getId()) {
-//            case R.id.btn_scan:
-//                /*
-//                if (btn_scan.getText().equals(getString(R.string.start_scan))) { // 开始扫描
-//                    checkPermissions();
-//                    bleSetScanRule();
-//                    bleStartScan();
-//                } else if (btn_scan.getText().equals(getString(R.string.stop_scan))) { // 停止扫描
-//                    BleManager.getInstance().cancelScan();
-//                }*/
-//
-//                if (ble_scan_status == BLE_STOP_SCAN_STATUS) { // 开始扫描
-//                    checkPermissions();
-//                    bleSetScanRule();
-//                    bleStartScan();
-//                } else if (ble_scan_status == BLE_SCAN_STATUS) { // 停止扫描
-//                    BleManager.getInstance().cancelScan();
-//                }
-//                break;
-//            default:
-//                break;
-//        }
-//    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.device_toolbar, menu);
-        menuItem_scan = menu.findItem(R.id.action_scan);
+        menuItemScan = menu.findItem(R.id.action_scan);
         return true;
     }
 
@@ -131,23 +105,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_scan:
-
-                Toast.makeText(this, menuItem_scan.getTitle(), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onOptionsItemSelected: " + menuItem_scan.getTitle());
-
-                /*
-                if (btn_scan.getText().equals(getString(R.string.start_scan))) { // 开始扫描
+                if (bleScanStatus == BLE_STOP_SCAN_STATUS) { // 开始扫描
                     checkPermissions();
                     bleSetScanRule();
                     bleStartScan();
-                } else if (btn_scan.getText().equals(getString(R.string.stop_scan))) { // 停止扫描
-                    BleManager.getInstance().cancelScan();
-                }*/
-                if (ble_scan_status == BLE_STOP_SCAN_STATUS) { // 开始扫描
-                    checkPermissions();
-                    bleSetScanRule();
-                    bleStartScan();
-                } else if (ble_scan_status == BLE_SCAN_STATUS) { // 停止扫描
+                } else if (bleScanStatus == BLE_SCAN_STATUS) { // 停止扫描
                     BleManager.getInstance().cancelScan();
                 }
                 break;
@@ -186,11 +148,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_device);
         setSupportActionBar(toolbar);
 
-//        btn_scan = (Button) findViewById(R.id.btn_scan);
-//        btn_scan.setText(getString(R.string.start_scan));
-//        btn_scan.setOnClickListener(this);
-
-        img_loading = (ImageView) findViewById(R.id.img_loading);
+        deviceScanLogo = (LinearLayout) findViewById(R.id.device_scan_logo);
+        imgLoading = (ImageView) findViewById(R.id.img_loading);
         operatingAnim = AnimationUtils.loadAnimation(this, R.anim.rotate);
         operatingAnim.setInterpolator(new LinearInterpolator());
         progressDialog = new ProgressDialog(this);
@@ -290,12 +249,11 @@ public class MainActivity extends AppCompatActivity {
                 mDeviceAdapter.clearScanDevice();
                 mDeviceAdapter.notifyDataSetChanged();
 
-                img_loading.startAnimation(operatingAnim);
-                img_loading.setVisibility(View.VISIBLE);
+                imgLoading.startAnimation(operatingAnim);
+                deviceScanLogo.setVisibility(View.VISIBLE);
+                menuItemScan.setTitle(getString(R.string.stop_scan));
 
-                ble_scan_status = BLE_SCAN_STATUS;
-//                btn_scan.setText(getString(R.string.stop_scan)); // 停止扫描
-                menuItem_scan.setTitle(getString(R.string.stop_scan));
+                bleScanStatus = BLE_SCAN_STATUS;
             }
 
             @Override
@@ -311,12 +269,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
-                img_loading.clearAnimation();
-                img_loading.setVisibility(View.INVISIBLE);
+                deviceScanLogo.setVisibility(View.GONE);
+                imgLoading.clearAnimation();
+                menuItemScan.setTitle(getString(R.string.start_scan));
 
-                ble_scan_status = BLE_STOP_SCAN_STATUS;
-//                btn_scan.setText(getString(R.string.start_scan)); // 开始扫描
-                menuItem_scan.setTitle(getString(R.string.start_scan));
+                bleScanStatus = BLE_STOP_SCAN_STATUS;
             }
         });
     }
@@ -330,14 +287,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                img_loading.clearAnimation();
-                img_loading.setVisibility(View.INVISIBLE);
-
-                ble_scan_status = BLE_SCAN_STATUS;
-//                btn_scan.setText(getString(R.string.start_scan)); // 开始扫描
-                menuItem_scan.setTitle(getString(R.string.start_scan));
+                deviceScanLogo.setVisibility(View.GONE);
+                imgLoading.clearAnimation();
+                menuItemScan.setTitle(getString(R.string.start_scan));
 
                 progressDialog.dismiss();
+
+                bleScanStatus = BLE_SCAN_STATUS;
 
                 Toast.makeText(MainActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
             }

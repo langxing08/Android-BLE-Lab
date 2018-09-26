@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">BleTest</string>
-    <string name="show_log">Show Log</string>
+    <string name="show_log">显示日志</string>
+    <string name="device_scanning">正在扫描BLE设备</string>
     <string name="service">服务</string>
     <string name="characteristic">特征值</string>
     <string name="type">服务类型</string>
