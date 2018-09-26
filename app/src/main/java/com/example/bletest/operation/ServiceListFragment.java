@@ -132,8 +132,7 @@ public class ServiceListFragment extends Fragment {
             BluetoothGattService service = bluetoothGattServiceList.get(position);
             String uuid = service.getUuid().toString();
             String type = String.valueOf(service.getType());
-
-            //holder.txt_service_name.setText(String.valueOf(getActivity().getString(R.string.service) + "(" + position + ")"));
+            
             holder.txt_service_name.setText(SampleGattAttributes.lookup(uuid, "Unknown"));
             holder.txt_service_uuid.setText(uuid);
             holder.txt_service_type.setText(String.valueOf(getActivity().getString(R.string.type) + "(" + type + ")"));
