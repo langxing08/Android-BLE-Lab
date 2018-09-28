@@ -1,6 +1,8 @@
 package com.example.bletest.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -8,9 +10,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.data.BleDevice;
+import com.example.bletest.Device;
 import com.example.bletest.R;
 
 import java.util.ArrayList;
@@ -19,41 +23,43 @@ import java.util.List;
 public class DeviceAdapter extends BaseAdapter{
 
     private Context context;
-    private List<BleDevice> bleDeviceList;
+    private int resourceId;
+    private List<BleDevice> mBleDeviceList;
 
-    public DeviceAdapter(Context context) {
+    public DeviceAdapter(Context context, int resourceId, List<BleDevice> objects) {
         this.context = context;
-        bleDeviceList = new ArrayList<>();
+        this.resourceId = resourceId;
+        this.mBleDeviceList = objects;
     }
 
     public void addDevice(BleDevice bleDevice) {
         removeDevice(bleDevice);
-        bleDeviceList.add(bleDevice);
+        mBleDeviceList.add(bleDevice);
     }
 
     public void removeDevice(BleDevice bleDevice) {
-        for (int i = 0; i < bleDeviceList.size(); i++) {
-            BleDevice device = bleDeviceList.get(i);
+        for (int i = 0; i < mBleDeviceList.size(); i++) {
+            BleDevice device = mBleDeviceList.get(i);
             if (bleDevice.getKey().equals(device.getKey())) {
-                bleDeviceList.remove(i);
+                mBleDeviceList.remove(i);
             }
         }
     }
 
     public void clearConnectedDevice() {
-        for (int i = 0; i < bleDeviceList.size(); i++) {
-            BleDevice device = bleDeviceList.get(i);
+        for (int i = 0; i < mBleDeviceList.size(); i++) {
+            BleDevice device = mBleDeviceList.get(i);
             if (BleManager.getInstance().isConnected(device)) {
-                bleDeviceList.remove(i);
+                mBleDeviceList.remove(i);
             }
         }
     }
 
     public void clearScanDevice() {
-        for (int i = 0; i < bleDeviceList.size(); i++) {
-            BleDevice device = bleDeviceList.get(i);
+        for (int i = 0; i < mBleDeviceList.size(); i++) {
+            BleDevice device = mBleDeviceList.get(i);
             if (!BleManager.getInstance().isConnected(device)) {
-                bleDeviceList.remove(i);
+                mBleDeviceList.remove(i);
             }
         }
     }
@@ -65,15 +71,15 @@ public class DeviceAdapter extends BaseAdapter{
 
     @Override
     public int getCount() {
-        return bleDeviceList.size();
+        return mBleDeviceList.size();
     }
 
     @Override
     public BleDevice getItem(int position) {
-        if (position > bleDeviceList.size()) {
+        if (position > mBleDeviceList.size()) {
             return null;
         }
-        return bleDeviceList.get(position);
+        return mBleDeviceList.get(position);
     }
 
     @Override
@@ -82,86 +88,36 @@ public class DeviceAdapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(int position, View view, ViewGroup parent) {
-        ViewHolder holder;
-        if (view != null) {
-            holder = (ViewHolder) view.getTag();
-        } else {
-            view = View.inflate(context, R.layout.adapter_device, null);
-            holder = new ViewHolder();
-            view.setTag(holder);
+    public View getView(int position, View convertView, ViewGroup parent) {
+        BleDevice bleDevice = getItem(position);
+        View view;
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            view = LayoutInflater.from(context).inflate(resourceId, parent, false);
+            viewHolder = new ViewHolder();
+            viewHolder.img_blue = (ImageView) view.findViewById(R.id.img_bluetooth);
+            viewHolder.txt_name = (TextView) view.findViewById(R.id.txt_device_name);
+            viewHolder.txt_mac = (TextView) view.findViewById(R.id.txt_mac);
+            viewHolder.txt_rssi = (TextView) view.findViewById(R.id.txt_rssi);
+            viewHolder.btn_connect = (Button) view.findViewById(R.id.btn_connect);
 
-            holder.img_blue = (ImageView) view.findViewById(R.id.img_blue);
-            holder.txt_name = (TextView) view.findViewById(R.id.txt_name);
-            holder.txt_mac = (TextView) view.findViewById(R.id.txt_mac);
-            holder.txt_rssi = (TextView) view.findViewById(R.id.txt_rssi);
-            holder.layout_idle = (LinearLayout) view.findViewById(R.id.layout_idle);
-            holder.layout_connected = (LinearLayout) view.findViewById(R.id.layout_connected);
-            holder.btn_connect = (Button) view.findViewById(R.id.btn_connect);
-            holder.btn_disconnect = (Button) view.findViewById(R.id.btn_disconnect);
-            holder.btn_detail = (Button) view.findViewById(R.id.btn_detail);
+            view.setTag(viewHolder);  // 将ViewHolder存储在View中
+        } else {
+            view = convertView;
+            viewHolder = (ViewHolder) view.getTag();  // 重新获取ViewHolder
         }
 
-        final BleDevice bleDevice = getItem(position);
         if (bleDevice != null) {
-            boolean isConnected = BleManager.getInstance().isConnected(bleDevice);
             String name = bleDevice.getName();
             String mac = bleDevice.getMac();
             int rssi = bleDevice.getRssi();
 
+            viewHolder.img_blue.setImageResource(R.mipmap.ic_blue_remote);
             // 设备名称为空时, 强制将设备名称设置为N/A
-            if ((name == null) || (name.length() == 0)) {
-                holder.txt_name.setText("N/A");
-            } else {
-                holder.txt_name.setText(name);
-            }
-
-            holder.txt_mac.setText(mac);
-            holder.txt_rssi.setText(String.valueOf(rssi));
-
-            if (isConnected) {
-                holder.img_blue.setImageResource(R.mipmap.ic_blue_connected);
-                holder.txt_name.setTextColor(0xFF1dE9B6);
-                holder.txt_mac.setTextColor(0xFF1dE9B6);
-
-                holder.layout_idle.setVisibility(View.GONE);
-                holder.layout_connected.setVisibility(View.VISIBLE);
-            } else {
-                holder.img_blue.setImageResource(R.mipmap.ic_blue_remote);
-                holder.txt_name.setTextColor(0xFF000000);
-                holder.txt_mac.setTextColor(0xFF000000);
-
-                holder.layout_idle.setVisibility(View.VISIBLE);
-                holder.layout_connected.setVisibility(View.GONE);
-            }
+            viewHolder.txt_name.setText((name == null) || (name.length() == 0) ? "N/A" : name);
+            viewHolder.txt_mac.setText(mac);
+            viewHolder.txt_rssi.setText(String.valueOf(rssi));
         }
-
-        holder.btn_connect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener != null) {
-                    mListener.onConnect(bleDevice);
-                }
-            }
-        });
-
-        holder.btn_disconnect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener != null) {
-                    mListener.onDisConnect(bleDevice);
-                }
-            }
-        });
-
-        holder.btn_detail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener != null) {
-                    mListener.onDetail(bleDevice);
-                }
-            }
-        });
 
         return view;
     }
@@ -173,24 +129,6 @@ public class DeviceAdapter extends BaseAdapter{
         TextView txt_mac;
         TextView txt_rssi;
 
-        LinearLayout layout_idle;
-        LinearLayout layout_connected;
-
-        Button btn_disconnect;
         Button btn_connect;
-        Button btn_detail;
     }
-
-    public interface OnDeviceClickListener {
-        void onConnect(BleDevice bleDevice);
-        void onDisConnect(BleDevice bleDevice);
-        void onDetail(BleDevice bleDevice);
-    }
-
-    private OnDeviceClickListener mListener;
-
-    public void setOnDeviceClickListener(OnDeviceClickListener listener) {
-        this.mListener = listener;
-    }
-
 }

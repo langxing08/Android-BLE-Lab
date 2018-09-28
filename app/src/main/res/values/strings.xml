@@ -9,6 +9,7 @@
     <string name="stop_scan">停止扫描</string>
     <string name="read">读</string>
     <string name="write">写</string>
+    <string name="connect">连接</string>
     <string name="notify_enable">使能通知</string>
     <string name="notify_disable">关闭通知</string>
     <string name="indicate_enable">使能指示</string>

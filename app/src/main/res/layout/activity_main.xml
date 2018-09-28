@@ -16,6 +16,7 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:title="@string/app_name" />
 
+    <!-- 用于显示应用处于正在扫描BLE设备的状态 -->
     <LinearLayout
         android:id="@+id/device_scan_logo"
         android:layout_width="match_parent"
@@ -44,6 +45,7 @@
 
     </LinearLayout>
 
+    <!-- 用于显示扫描到的BLE设备 -->
     <ListView
         android:id="@+id/list_ble_device"
         android:layout_width="match_parent"

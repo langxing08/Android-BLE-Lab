@@ -12,7 +12,7 @@
 
         <!--Bluetooth Logo-->
         <ImageView
-            android:id="@+id/img_blue"
+            android:id="@+id/img_bluetooth"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_centerVertical="true"
@@ -22,14 +22,14 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/img_blue"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/img_bluetooth"
             android:gravity="center_vertical"
             android:orientation="vertical">
 
             <!--DeviceName-->
             <TextView
-                android:id="@+id/txt_name"
+                android:id="@+id/txt_device_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
@@ -50,7 +50,7 @@
             android:id="@+id/layout_idle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:gravity="center"
             android:orientation="horizontal"
             android:visibility="gone">
@@ -66,7 +66,7 @@
             <ImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:layout_marginLeft="5dp"
+                android:layout_marginStart="5dp"
                 android:src="@mipmap/ic_rssi"/>
 
             <!--BLE Connect Button-->
@@ -74,45 +74,8 @@
                 android:id="@+id/btn_connect"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="连接"
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <!--Operate UI When BLE Connected-->
-        <LinearLayout
-            android:id="@+id/layout_connected"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <!--已连接-->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="已连接"
-                android:textColor="@color/colorPrimary"
-                android:textSize="14sp"/>
-
-            <!--断开连接-->
-            <Button
-                android:id="@+id/btn_disconnect"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="断开连接"
-                android:textSize="12sp"/>
-
-            <!--进入操作-->
-            <Button
-                android:id="@+id/btn_detail"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="进入操作"
+                android:layout_marginStart="5dp"
+                android:text="@string/connect"
                 android:textSize="12sp"/>
 
         </LinearLayout>

@@ -6,25 +6,19 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.LocationManager;
-import android.support.annotation.AnimatorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
-import android.widget.Button;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -38,7 +32,6 @@ import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 import com.example.bletest.adapter.DeviceAdapter;
 import com.example.bletest.comm.ObserverManager;
-import com.example.bletest.operation.OperationActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Animation operatingAnim;
     private DeviceAdapter mDeviceAdapter;
     private ProgressDialog progressDialog;
+
+    private List<BleDevice> bleDeviceList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,34 +133,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         operatingAnim.setInterpolator(new LinearInterpolator());
         progressDialog = new ProgressDialog(this);
 
-        mDeviceAdapter = new DeviceAdapter(this);
-        mDeviceAdapter.setOnDeviceClickListener(new DeviceAdapter.OnDeviceClickListener() {
-            @Override
-            public void onConnect(BleDevice bleDevice) {
-                if (!BleManager.getInstance().isConnected(bleDevice)) {
-                    BleManager.getInstance().cancelScan();
-                    bleConnect(bleDevice);
-                }
-            }
-
-            @Override
-            public void onDisConnect(BleDevice bleDevice) {
-                if (BleManager.getInstance().isConnected(bleDevice)) {
-                    BleManager.getInstance().disconnect(bleDevice);
-                }
-            }
-
-            @Override
-            public void onDetail(BleDevice bleDevice) {
-                if (BleManager.getInstance().isConnected(bleDevice)) {
-                    Intent intent = new Intent(MainActivity.this, OperationActivity.class);
-                    intent.putExtra(OperationActivity.KEY_DATA, bleDevice);
-                    startActivity(intent);
-                }
-            }
-        });
+        mDeviceAdapter = new DeviceAdapter(MainActivity.this, R.layout.device_item, bleDeviceList);
         ListView listViewDevice = (ListView) findViewById(R.id.list_ble_device);
         listViewDevice.setAdapter(mDeviceAdapter);
+        listViewDevice.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BleDevice bleDevice = bleDeviceList.get(position);
+                BleManager.getInstance().cancelScan(); // 停止扫描
+                bleConnect(bleDevice);  // 建立连接
+            }
+        });
     }
 
     private void showConnectedDevice() {
@@ -177,6 +155,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         mDeviceAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * 检查App运行所需的权限是否已经获取
+     */
     private void checkPermissions() {
 
         // 检查BLE是否打开
