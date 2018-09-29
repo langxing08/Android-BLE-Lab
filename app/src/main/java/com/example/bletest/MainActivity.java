@@ -53,11 +53,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int BLE_STOP_SCAN_STATUS = 0;
     private int bleScanStatus = BLE_STOP_SCAN_STATUS;   // BLE扫描状态标志位
 
-    private LinearLayout deviceScanLogo;    // 设备扫描Layout,包括图片和文字
-    private ImageView imgLoading;           // 设备扫描图片
+    private LinearLayout deviceScanLayout;  // 设备扫描Layout,包括图片和文字
+    private ImageView loadingImageView;     // 设备扫描图片
     private Animation operatingAnim;        // 设备扫描图片动画效果
 
-    private MenuItem menuItemScan;          // 工具栏中的菜单
+    private MenuItem scanMenuItem;          // 工具栏中的菜单
 
     public DeviceAdapter mDeviceAdapter;    // 设备适配器
 
@@ -101,14 +101,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.device_toolbar, menu);
-        menuItemScan = menu.findItem(R.id.action_scan);
+        scanMenuItem = menu.findItem(R.id.action_scan_item);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_scan:
+            case R.id.action_scan_item:
                 if (bleScanStatus == BLE_STOP_SCAN_STATUS) { // 开始扫描
                     bleSetScanRule();
                     bleStartScan();
@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     BleManager.getInstance().cancelScan();
                 }
                 break;
-            case R.id.action_show_log:
+            case R.id.action_show_log_item:
                 Toast.makeText(this, "show log", Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -130,16 +130,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * View初始化
      */
     private void initView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_device);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.device_toolbar);
         setSupportActionBar(toolbar);
 
-        deviceScanLogo = (LinearLayout) findViewById(R.id.device_scan_logo);
-        imgLoading = (ImageView) findViewById(R.id.img_loading);
+        deviceScanLayout = (LinearLayout) findViewById(R.id.device_scan_logo_layout);
+        loadingImageView = (ImageView) findViewById(R.id.loading_img);
         operatingAnim = AnimationUtils.loadAnimation(this, R.anim.rotate);
         operatingAnim.setInterpolator(new LinearInterpolator());
         progressDialog = new ProgressDialog(this);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list_ble_device);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.device_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         mDeviceAdapter = new DeviceAdapter(bleDeviceList);
@@ -252,9 +252,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 mDeviceAdapter.clearScanDevice();
                 mDeviceAdapter.notifyDataSetChanged();
 
-                imgLoading.startAnimation(operatingAnim);
-                deviceScanLogo.setVisibility(View.VISIBLE);
-                menuItemScan.setTitle(getString(R.string.stop_scan));
+                loadingImageView.startAnimation(operatingAnim);
+                deviceScanLayout.setVisibility(View.VISIBLE);
+                scanMenuItem.setTitle(getString(R.string.stop_scan));
 
                 bleScanStatus = BLE_SCAN_STATUS;
             }
@@ -272,9 +272,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
-                deviceScanLogo.setVisibility(View.GONE);
-                imgLoading.clearAnimation();
-                menuItemScan.setTitle(getString(R.string.start_scan));
+                deviceScanLayout.setVisibility(View.GONE);
+                loadingImageView.clearAnimation();
+                scanMenuItem.setTitle(getString(R.string.start_scan));
 
                 bleScanStatus = BLE_STOP_SCAN_STATUS;
             }
@@ -294,9 +294,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                deviceScanLogo.setVisibility(View.GONE);
-                imgLoading.clearAnimation();
-                menuItemScan.setTitle(getString(R.string.start_scan));
+                deviceScanLayout.setVisibility(View.GONE);
+                loadingImageView.clearAnimation();
+                scanMenuItem.setTitle(getString(R.string.start_scan));
 
                 progressDialog.dismiss();
 

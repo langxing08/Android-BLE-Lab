@@ -25,24 +25,24 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
 
         View deviceView;
 
-        ImageView img_blue;
+        ImageView bluetoothImg;
 
-        TextView txt_name;
-        TextView txt_mac;
-        TextView txt_rssi;
+        TextView deviceNameTxt;
+        TextView macTxt;
+        TextView rssiTxt;
 
-        Button btn_connect;
+        Button connectBtn;
 
         ViewHolder(View view) {
             super(view);
 
             deviceView = view;
 
-            img_blue = (ImageView) view.findViewById(R.id.img_bluetooth);
-            txt_name = (TextView) view.findViewById(R.id.txt_device_name);
-            txt_mac = (TextView) view.findViewById(R.id.txt_mac);
-            txt_rssi = (TextView) view.findViewById(R.id.txt_rssi);
-            btn_connect = (Button) view.findViewById(R.id.btn_connect);
+            bluetoothImg = (ImageView) view.findViewById(R.id.bluetooth_img);
+            deviceNameTxt = (TextView) view.findViewById(R.id.device_name_txt);
+            macTxt = (TextView) view.findViewById(R.id.mac_txt);
+            rssiTxt = (TextView) view.findViewById(R.id.rssi_txt);
+            connectBtn = (Button) view.findViewById(R.id.connect_btn);
         }
     }
 
@@ -70,7 +70,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             }
         });
 
-        holder.btn_connect.setOnClickListener(new View.OnClickListener() {
+        holder.connectBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
@@ -95,11 +95,11 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         String mac = bleDevice.getMac();
         int rssi = bleDevice.getRssi();
 
-        holder.img_blue.setImageResource(R.mipmap.ic_blue_remote);
+        holder.bluetoothImg.setImageResource(R.mipmap.ic_blue_remote);
         // 设备名称为空时, 强制将设备名称设置为N/A
-        holder.txt_name.setText((name == null) || (name.length() == 0) ? "N/A" : name);
-        holder.txt_mac.setText(mac);
-        holder.txt_rssi.setText(String.valueOf(rssi));
+        holder.deviceNameTxt.setText((name == null) || (name.length() == 0) ? "N/A" : name);
+        holder.macTxt.setText(mac);
+        holder.rssiTxt.setText(String.valueOf(rssi));
     }
 
     @Override

@@ -9,7 +9,7 @@
 
     <!--Bluetooth Logo-->
     <ImageView
-        android:id="@+id/img_bluetooth"
+        android:id="@+id/bluetooth_img"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_centerVertical="true"
@@ -22,13 +22,13 @@
         android:layout_width="wrap_content"
         android:layout_height="56dp"
         android:layout_marginStart="10dp"
-        android:layout_toEndOf="@id/img_bluetooth"
+        android:layout_toEndOf="@id/bluetooth_img"
         android:gravity="center_vertical"
         android:orientation="vertical">
 
         <!--DeviceName-->
         <TextView
-            android:id="@+id/txt_device_name"
+            android:id="@+id/device_name_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
@@ -36,7 +36,7 @@
 
         <!--MAC-->
         <TextView
-            android:id="@+id/txt_mac"
+            android:id="@+id/mac_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -46,27 +46,27 @@
 
     <!--RSSI-->
     <TextView
-        android:id="@+id/txt_rssi"
+        android:id="@+id/rssi_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@id/img_rssi_logo"
+        android:layout_toStartOf="@id/rssi_logo_img"
         android:layout_centerVertical="true"
         android:layout_marginEnd="5dp"
         android:textSize="14sp"/>
 
     <!--RSSI Logo-->
     <ImageView
-        android:id="@+id/img_rssi_logo"
+        android:id="@+id/rssi_logo_img"
         android:layout_width="18dp"
         android:layout_height="18dp"
-        android:layout_toStartOf="@id/btn_connect"
+        android:layout_toStartOf="@id/connect_btn"
         android:layout_centerVertical="true"
         android:layout_marginEnd="5dp"
         android:src="@mipmap/ic_rssi"/>
 
     <!--BLE Connect Button-->
     <Button
-        android:id="@+id/btn_connect"
+        android:id="@+id/connect_btn"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"

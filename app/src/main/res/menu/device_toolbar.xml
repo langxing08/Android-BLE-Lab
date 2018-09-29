@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_scan"
+        android:id="@+id/action_scan_item"
         android:title="@string/start_scan"
         android:orderInCategory="1"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_show_log"
+        android:id="@+id/action_show_log_item"
         android:title="@string/show_log"
         android:orderInCategory="2"
         app:showAsAction="never" />
