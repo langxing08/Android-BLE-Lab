@@ -1,85 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--BLE Scan UI-->
-<LinearLayout
+<!-- LinearLayout的layout_height必须为wrap_content, 否则会导致RecyclerView只能显示第一行 -->
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp">
+    <!--Bluetooth Logo-->
+    <ImageView
+        android:id="@+id/img_bluetooth"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="5dp"
+        android:src="@mipmap/ic_blue_remote"
+        android:contentDescription="@string/app_name"/>
 
-        <!--Bluetooth Logo-->
-        <ImageView
-            android:id="@+id/img_bluetooth"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerVertical="true"
-            android:src="@mipmap/ic_blue_remote" />
+    <!--DeviceName and MAC-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="56dp"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@id/img_bluetooth"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
-        <!--DeviceName and MAC-->
-        <LinearLayout
+        <!--DeviceName-->
+        <TextView
+            android:id="@+id/txt_device_name"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:layout_toEndOf="@id/img_bluetooth"
-            android:gravity="center_vertical"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:textSize="14sp"/>
 
-            <!--DeviceName-->
-            <TextView
-                android:id="@+id/txt_device_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
-                android:textSize="14sp"/>
-
-            <!--MAC-->
-            <TextView
-                android:id="@+id/txt_mac"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textSize="12sp"/>
-
-        </LinearLayout>
-
-        <!--Operate UI When BLE Unconnected-->
-        <LinearLayout
-            android:id="@+id/layout_idle"
+        <!--MAC-->
+        <TextView
+            android:id="@+id/txt_mac"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="12sp"/>
 
-            <!--RSSI-->
-            <TextView
-                android:id="@+id/txt_rssi"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="14sp" />
+    </LinearLayout>
 
-            <!--RSSI Logo-->
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_marginStart="5dp"
-                android:src="@mipmap/ic_rssi"/>
+    <!--RSSI-->
+    <TextView
+        android:id="@+id/txt_rssi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@id/img_rssi_logo"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="5dp"
+        android:textSize="14sp"/>
 
-            <!--BLE Connect Button-->
-            <Button
-                android:id="@+id/btn_connect"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="@string/connect"
-                android:textSize="12sp"/>
+    <!--RSSI Logo-->
+    <ImageView
+        android:id="@+id/img_rssi_logo"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_toStartOf="@id/btn_connect"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="5dp"
+        android:src="@mipmap/ic_rssi"/>
 
-        </LinearLayout>
+    <!--BLE Connect Button-->
+    <Button
+        android:id="@+id/btn_connect"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="5dp"
+        android:layout_alignParentEnd="true"
+        android:text="@string/connect"
+        android:textSize="12sp"/>
 
-    </RelativeLayout>
-
-</LinearLayout>
+</RelativeLayout>

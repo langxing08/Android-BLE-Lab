@@ -11,7 +11,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,16 +51,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private static final int BLE_SCAN_STATUS = 1;
     private static final int BLE_STOP_SCAN_STATUS = 0;
-    private int bleScanStatus = BLE_STOP_SCAN_STATUS;
+    private int bleScanStatus = BLE_STOP_SCAN_STATUS;   // BLE扫描状态标志位
 
-    private LinearLayout deviceScanLogo;
-    private ImageView imgLoading;
+    private LinearLayout deviceScanLogo;    // 设备扫描Layout,包括图片和文字
+    private ImageView imgLoading;           // 设备扫描图片
+    private Animation operatingAnim;        // 设备扫描图片动画效果
 
-    private MenuItem menuItemScan;
+    private MenuItem menuItemScan;          // 工具栏中的菜单
 
-    private Animation operatingAnim;
-    private DeviceAdapter mDeviceAdapter;
-    private ProgressDialog progressDialog;
+    public DeviceAdapter mDeviceAdapter;    // 设备适配器
+
+    private ProgressDialog progressDialog;  // 设备连接进度条
 
     private List<BleDevice> bleDeviceList = new ArrayList<>();
 
@@ -122,7 +126,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
 
-
+    /**
+     * View初始化
+     */
     private void initView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_device);
         setSupportActionBar(toolbar);
@@ -133,19 +139,34 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         operatingAnim.setInterpolator(new LinearInterpolator());
         progressDialog = new ProgressDialog(this);
 
-        mDeviceAdapter = new DeviceAdapter(MainActivity.this, R.layout.device_item, bleDeviceList);
-        ListView listViewDevice = (ListView) findViewById(R.id.list_ble_device);
-        listViewDevice.setAdapter(mDeviceAdapter);
-        listViewDevice.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list_ble_device);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        mDeviceAdapter = new DeviceAdapter(bleDeviceList);
+        mDeviceAdapter.setOnDeviceClickListener(new DeviceAdapter.OnDeviceClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                BleDevice bleDevice = bleDeviceList.get(position);
-                BleManager.getInstance().cancelScan(); // 停止扫描
-                bleConnect(bleDevice);  // 建立连接
+            public void onConnect(BleDevice bleDevice) {
+                if (!BleManager.getInstance().isConnected(bleDevice)) {
+                    BleManager.getInstance().cancelScan();
+                    bleConnect(bleDevice);
+                }
+
+                Log.d(TAG, "onConnect: " + bleDevice.getName());
+            }
+
+            @Override
+            public void onDetail(BleDevice bleDevice) {
+                // 解析广播包
+
+                Log.d(TAG, "onDetail: " + bleDevice.getName());
             }
         });
+        recyclerView.setAdapter(mDeviceAdapter);
     }
 
+    /**
+     * 显示可连接的BLE设备
+     */
     private void showConnectedDevice() {
         List<BleDevice> deviceList = BleManager.getInstance().getAllConnectedDevice();
         mDeviceAdapter.clearConnectedDevice();
@@ -207,8 +228,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     }
 
 
-
-
+    /**
+     * 设置BLE扫描规则
+     */
     private void bleSetScanRule() {
         BleScanRuleConfig scanRuleConfig = new BleScanRuleConfig.Builder()
              //   .setServiceUuids(null)
@@ -220,6 +242,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         BleManager.getInstance().initScanRule(scanRuleConfig);
     }
 
+    /**
+     * 开始BLE扫描
+     */
     private void bleStartScan() {
         BleManager.getInstance().scan(new BleScanCallback() {
             @Override
@@ -256,7 +281,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         });
     }
 
-    private void bleConnect(final BleDevice bleDevice) {
+    /**
+     * 连接BLE设备
+     * @param bleDevice
+     */
+    public void bleConnect(final BleDevice bleDevice) {
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
             public void onStartConnect() {
@@ -302,6 +331,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         });
     }
 
+    /**
+     * 检查手机GPS是否打开
+     * @return
+     */
     private boolean checkGpsIsOpen() {
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (locationManager == null) {
