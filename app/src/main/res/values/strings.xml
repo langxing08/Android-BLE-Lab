@@ -16,4 +16,6 @@
     <string name="indicate_disable">关闭指示</string>
     <string name="select_operation_type">选择操作类型</string>
     <string name="characteristic_write">发送</string>
+    <string name="device_name">设备名称</string>
+    <string name="mac_address">MAC Address</string>
 </resources>

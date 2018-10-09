@@ -67,8 +67,8 @@ public class ServiceListFragment extends Fragment {
 
         BluetoothGatt gatt = BleManager.getInstance().getBluetoothGatt(bleDevice);
 
-        txtServiceName.setText(String.valueOf("设备广播名: " + name));
-        txtServiceMac.setText(String.valueOf("MAC: " + mac));
+        txtServiceName.setText(String.valueOf("设备名称: " + name));
+        txtServiceMac.setText(String.valueOf("MAC Address: " + mac));
 
         mResultAdapter.clear();
         for (BluetoothGattService service : gatt.getServices()) {
@@ -120,7 +120,7 @@ public class ServiceListFragment extends Fragment {
             if (view != null) {
                 holder = (ViewHolder) view.getTag();
             } else {
-                view = View.inflate(context, R.layout.adapter_service, null);
+                view = View.inflate(context, R.layout.service_item, null);
                 holder = new ViewHolder();
                 view.setTag(holder);
 
@@ -133,7 +133,7 @@ public class ServiceListFragment extends Fragment {
             String uuid = service.getUuid().toString();
             String type = String.valueOf(service.getType());
             
-            holder.txt_service_name.setText(SampleGattAttributes.lookup(uuid, "Unknown"));
+            holder.txt_service_name.setText(SampleGattAttributes.lookup(uuid, "Unknown Service"));
             holder.txt_service_uuid.setText(uuid);
             holder.txt_service_type.setText(String.valueOf(getActivity().getString(R.string.type) + "(" + type + ")"));
 
