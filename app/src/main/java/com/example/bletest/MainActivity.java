@@ -35,6 +35,7 @@ import com.clj.fastble.exception.BleException;
 import com.clj.fastble.scan.BleScanRuleConfig;
 import com.example.bletest.adapter.DeviceAdapter;
 import com.example.bletest.comm.ObserverManager;
+import com.example.bletest.operation.OperationActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -311,6 +312,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
                 mDeviceAdapter.addDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
+
+                Intent intent = new Intent(MainActivity.this, OperationActivity.class);
+                intent.putExtra(OperationActivity.KEY_DATA, bleDevice);
+                startActivity(intent);
             }
 
             @Override
