@@ -3,7 +3,7 @@
     <string name="show_log">显示日志</string>
     <string name="device_scanning">正在扫描BLE设备</string>
     <string name="service">服务</string>
-    <string name="characteristic">特征值</string>
+    <string name="property">属性</string>
     <string name="type">服务类型</string>
     <string name="start_scan">开始扫描</string>
     <string name="stop_scan">停止扫描</string>
@@ -18,4 +18,11 @@
     <string name="characteristic_write">发送</string>
     <string name="device_name">设备名称</string>
     <string name="mac_address">MAC Address</string>
+
+    <string-array name="decoder">
+        <item>Str</item>
+        <item>Hex</item>
+        <item>Dec</item>
+    </string-array>
+
 </resources>

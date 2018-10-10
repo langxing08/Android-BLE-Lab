@@ -1,18 +1,26 @@
 package com.example.bletest.operation;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.clj.fastble.BleManager;
@@ -23,11 +31,14 @@ import com.clj.fastble.callback.BleWriteCallback;
 import com.clj.fastble.data.BleDevice;
 import com.clj.fastble.exception.BleException;
 import com.clj.fastble.utils.HexUtil;
+import com.example.bletest.ChatMsg;
 import com.example.bletest.R;
+import com.example.bletest.adapter.ChatMsgAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class CharacteristicOperationFragment extends Fragment {
 
     public static final int PROPERTY_READ = 1;
@@ -36,19 +47,96 @@ public class CharacteristicOperationFragment extends Fragment {
     public static final int PROPERTY_NOTIFY = 4;
     public static final int PROPERTY_INDICATE = 5;
 
-    private LinearLayout layout_container;
-    private List<String> childList = new ArrayList<>();
+    // 初始化控件
+    private List<ChatMsg> mChatMsgList = new ArrayList<>();
+    private RecyclerView msgRecyclerView;
+    private ChatMsgAdapter adapter;
+    private LinearLayoutManager layoutManager;
+
+    private ArrayAdapter<String> fmtAdapter;    // 数据格式Adapter
+    private static final String FMT_SELECT[] = { "Str", "Hex", "Dec" };
+    private int charReadFmtInt;     // 接收数据格式
+    private int charWriteFmtInt;    // 发送数据格式
+
+    private Spinner charReadFmtSelect;          // 读数据格式选择
+    private Button charNotifyIndicateEnableBtn; // 通知/指示 使能按钮
+    private Button charClearBtn;                // 清屏按钮
+    private Button charReadBtn;                 // 读数据按钮
+
+    private LinearLayout charWritableLayout;    // 写区域Layout
+    private CheckBox sendOnTimeCheckbox;        // 定时发送复选框
+    private EditText sendOnTimeEdit;            // 定时发送时间
+
+    private Spinner charWriteFmtSelect;         // 写数据格式选择
+    private EditText charWriteStringEdit;       // 写数据输入框(UTF-8格式)
+    private EditText charWriteHexEdit;          // 写数据输入框(十六进制格式)
+    private EditText charWriteDecEdit;          // 写数据输入框(十进制格式)
+    private Button charWriteBtn;                // 写数据按钮
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_characteristic_operation, null);
+        View view = inflater.inflate(R.layout.fragment_characteristic_operation, container, false);
         initView(view);
         return view;
     }
 
     private void initView(View view) {
-        layout_container = (LinearLayout) view.findViewById(R.id.layout_container);
+
+        // Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取
+        charReadFmtSelect = (Spinner) view.findViewById(R.id.char_read_fmt_select);
+        charNotifyIndicateEnableBtn = (Button) view.findViewById(R.id.char_notify_indicate_enable_btn);
+        charClearBtn = (Button) view.findViewById(R.id.char_clear_btn);
+        charReadBtn = (Button) view.findViewById(R.id.char_read_btn);
+
+        // 聊天信息区域
+        msgRecyclerView = (RecyclerView) view.findViewById(R.id.char_msg_recycler_view);
+        layoutManager = new LinearLayoutManager(getActivity());
+        msgRecyclerView.setLayoutManager(layoutManager);
+        adapter = new ChatMsgAdapter(mChatMsgList);
+        msgRecyclerView.setAdapter(adapter);
+
+        // Write区域, 包括发送定时、发送按钮
+        charWritableLayout = (LinearLayout) view.findViewById(R.id.char_writable_layout);
+        sendOnTimeCheckbox = (CheckBox) view.findViewById(R.id.send_onTime_checkbox);
+        sendOnTimeEdit = (EditText) view.findViewById(R.id.send_onTime_et);
+        charWriteFmtSelect = (Spinner) view.findViewById(R.id.char_write_fmt_select);
+        charWriteStringEdit = (EditText) view.findViewById(R.id.char_write_string_et);
+        charWriteHexEdit = (EditText) view.findViewById(R.id.char_write_hex_et);
+        charWriteDecEdit = (EditText) view.findViewById(R.id.char_write_dec_et);
+        charWriteBtn = (Button) view.findViewById(R.id.char_write_btn);
+
+        // 初始化接收数据格式
+        fmtAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, FMT_SELECT);
+        fmtAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        charReadFmtSelect.setAdapter(fmtAdapter);
+        charReadFmtSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                charReadFmtInt = i;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        // 初始化发送数据格式
+        charWriteFmtSelect.setAdapter(fmtAdapter);
+        charWriteFmtSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                charWriteFmtInt = i;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        
     }
 
     public void showData() {
@@ -56,284 +144,6 @@ public class CharacteristicOperationFragment extends Fragment {
         final BluetoothGattCharacteristic characteristic = ((OperationActivity) getActivity()).getBluetoothGattCharacteristic();
         final int charaProp = ((OperationActivity) getActivity()).getCharaProp();
         final String child = characteristic.getUuid().toString() + String.valueOf(charaProp);
-
-        for (int i = 0; i < layout_container.getChildCount(); i++) {
-            layout_container.getChildAt(i)
-                    .setVisibility(View.GONE);
-        }
-        if (childList.contains(child)) {
-            layout_container.findViewWithTag(bleDevice.getKey() + characteristic.getUuid().toString() + charaProp)
-                    .setVisibility(View.VISIBLE);
-        } else {
-            childList.add(child);
-
-            View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation, null);
-            view.setTag(bleDevice.getKey() + characteristic.getUuid().toString() + charaProp);
-            LinearLayout layoutAdd = (LinearLayout) view.findViewById(R.id.layout_add);
-            final TextView txtTitle = (TextView) view.findViewById(R.id.txt_title);
-            txtTitle.setText(String.valueOf(characteristic.getUuid().toString() + "的数据变化: "));
-            final TextView txt = (TextView) view.findViewById(R.id.txt);
-            txt.setMovementMethod(ScrollingMovementMethod.getInstance());
-
-            switch (charaProp) {
-                case PROPERTY_READ: {
-                    View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_button, null);
-                    Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText(getString(R.string.read)); // 读
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            BleManager.getInstance().read(
-                                    bleDevice,
-                                    characteristic.getService().getUuid().toString(),
-                                    characteristic.getUuid().toString(),
-                                    new BleReadCallback() {
-                                        @Override
-                                        public void onReadSuccess(final byte[] data) {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addText(txt, HexUtil.formatHexString(data, true));  // HEX Display
-                                                    addText(txt, new String(data)); // ASCII Display
-                                                }
-                                            });
-                                        }
-
-                                        @Override
-                                        public void onReadFailure(final BleException exception) {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addText(txt, exception.toString());
-                                                }
-                                            });
-                                        }
-                                    });
-                        }
-                    });
-                    layoutAdd.addView(viewAdd);
-                }
-                break;
-
-                case PROPERTY_WRITE: {
-                    View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_et, null);
-                    final EditText et = (EditText) viewAdd.findViewById(R.id.et);
-                    Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText(getString(R.string.write)); // 写
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            String hex = et.getText().toString();
-                            if (TextUtils.isEmpty(hex)) {
-                                return;
-                            }
-                            BleManager.getInstance().write(
-                                    bleDevice,
-                                    characteristic.getService().getUuid().toString(),
-                                    characteristic.getUuid().toString(),
-                                    HexUtil.hexStringToBytes(hex),
-                                    new BleWriteCallback() {
-                                        @Override
-                                        public void onWriteSuccess(final int current, final int total, final byte[] justWrite) {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addText(txt, "write success, current: " + current
-                                                            + " total: " + total
-                                                            + " justWrite: " + HexUtil.formatHexString(justWrite, true));
-                                                }
-                                            });
-                                        }
-
-                                        @Override
-                                        public void onWriteFailure(final BleException exception) {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addText(txt, exception.toString());
-                                                }
-                                            });
-                                        }
-                                    }
-                            );
-                        }
-                    });
-                    layoutAdd.addView(viewAdd);
-                }
-                break;
-
-                case PROPERTY_WRITE_NO_RESPONSE: {
-                    View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_et, null);
-                    final EditText et = (EditText) viewAdd.findViewById(R.id.et);
-                    Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText(getString(R.string.write)); // 写
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            String hex = et.getText().toString();
-                            if (TextUtils.isEmpty(hex)) {
-                                return;
-                            }
-                            BleManager.getInstance().write(
-                                    bleDevice,
-                                    characteristic.getService().getUuid().toString(),
-                                    characteristic.getUuid().toString(),
-                                    HexUtil.hexStringToBytes(hex),
-                                    new BleWriteCallback() {
-                                        @Override
-                                        public void onWriteSuccess(final int current, final int total, final byte[] justWrite) {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addText(txt, "write success, current: " + current
-                                                            + " total: " + total
-                                                            + " justWrite: " + HexUtil.formatHexString(justWrite, true));
-                                                }
-                                            });
-                                        }
-
-                                        @Override
-                                        public void onWriteFailure(final BleException exception) {
-                                            runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addText(txt, exception.toString());
-                                                }
-                                            });
-                                        }
-                                    }
-                            );
-                        }
-                    });
-                    layoutAdd.addView(viewAdd);
-                }
-                break;
-
-                case PROPERTY_NOTIFY: {
-                    View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_button, null);
-                    final Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText(getString(R.string.notify_enable)); // 打开通知
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if (btn.getText().toString().equals(getString(R.string.notify_enable))) { // 打开通知
-                                btn.setText(getString(R.string.notify_disable)); // 关闭通知
-                                BleManager.getInstance().notify(
-                                        bleDevice,
-                                        characteristic.getService().getUuid().toString(),
-                                        characteristic.getUuid().toString(),
-                                        new BleNotifyCallback() {
-                                            @Override
-                                            public void onNotifySuccess() {
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        addText(txt, "notify success");
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onNotifyFailure(final BleException exception) {
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        addText(txt, exception.toString());
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onCharacteristicChanged(byte[] data) {
-                                                addText(txt, HexUtil.formatHexString(characteristic.getValue()));
-                                            }
-                                        }
-                                );
-                            } else {
-                                btn.setText(getString(R.string.notify_enable)); // 打开通知
-                                BleManager.getInstance().stopNotify(
-                                        bleDevice,
-                                        characteristic.getService().getUuid().toString(),
-                                        characteristic.getUuid().toString());
-                            }
-                        }
-                    });
-                    layoutAdd.addView(viewAdd);
-                }
-                break;
-
-                case PROPERTY_INDICATE: {
-                    View viewAdd = LayoutInflater.from(getActivity()).inflate(R.layout.layout_characteristic_operation_button, null);
-                    final Button btn = (Button) viewAdd.findViewById(R.id.btn);
-                    btn.setText(getString(R.string.indicate_enable)); // 打开指示
-                    btn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if (btn.getText().toString().equals(getString(R.string.indicate_enable))) { // 打开指示
-                                btn.setText(getString(R.string.indicate_disable)); // 关闭指示
-                                BleManager.getInstance().indicate(
-                                        bleDevice,
-                                        characteristic.getService().getUuid().toString(),
-                                        characteristic.getUuid().toString(),
-                                        new BleIndicateCallback() {
-                                            @Override
-                                            public void onIndicateSuccess() {
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        addText(txt, "indicate success");
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onIndicateFailure(final BleException exception) {
-                                                runOnUiThread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        addText(txt, exception.toString());
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onCharacteristicChanged(byte[] data) {
-                                                addText(txt, HexUtil.formatHexString(characteristic.getValue()));
-                                            }
-                                        }
-                                );
-                            } else {
-                                btn.setText(getString(R.string.indicate_enable)); // 打开指示
-                                BleManager.getInstance().stopIndicate(
-                                        bleDevice,
-                                        characteristic.getService().getUuid().toString(),
-                                        characteristic.getUuid().toString());
-                            }
-                        }
-                    });
-                    layoutAdd.addView(viewAdd);
-                }
-                break;
-            }
-
-        layout_container.addView(view);
-        }
-    }
-
-    private void runOnUiThread(Runnable runnable) {
-        if (isAdded() && (getActivity() != null)) {
-            getActivity().runOnUiThread(runnable);
-        }
-    }
-
-    private void addText(TextView textView, String content) {
-        textView.append(content);
-        textView.append("\n");
-
-        int offset = textView.getLineCount() * textView.getLineHeight();
-        if (offset > textView.getHeight()) {
-            textView.scrollTo(0, offset - textView.getHeight());
-        }
     }
 
 }

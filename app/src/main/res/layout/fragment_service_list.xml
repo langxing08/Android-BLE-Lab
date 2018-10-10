@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!-- Device Name -->
     <TextView
         android:id="@+id/txt_service_device_name"
         android:layout_width="wrap_content"
@@ -16,6 +17,7 @@
         android:textSize="14sp"
         android:textStyle="bold"/>
 
+    <!-- MAC Address -->
     <TextView
         android:id="@+id/txt_service_mac"
         android:layout_width="wrap_content"
@@ -26,6 +28,7 @@
         android:textSize="14sp"
         android:textStyle="bold" />
 
+    <!-- Service ListView -->
     <ListView
         android:id="@+id/list_service"
         android:layout_width="match_parent"

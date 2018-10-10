@@ -1,9 +1,11 @@
 package com.example.bletest.operation;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,6 +26,9 @@ import com.example.bletest.tool.SampleGattAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.bletest.operation.OperationActivity.CHAR_OPERATION_PAGE;
+
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class CharacteristicListFragment extends Fragment{
 
     private ResultAdapter mResultAdapter;
@@ -70,23 +75,26 @@ public class CharacteristicListFragment extends Fragment{
                     propNameList.add("Indicate");
                 }
 
-                if (propList.size() > 1) {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(getActivity().getString(R.string.select_operation_type)) // 选择操作类型
-                            .setItems(propNameList.toArray(new String[propNameList.size()]), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int which) {
-                                    ((OperationActivity) getActivity()).setBluetoothGattCharacteristic(characteristic);
-                                    ((OperationActivity) getActivity()).setCharaProp(propList.get(which));
-                                    ((OperationActivity) getActivity()).changePage(2);
-                                }
-                            })
-                            .show();
-                } else if (propList.size() > 0) {
-                    ((OperationActivity) getActivity()).setBluetoothGattCharacteristic(characteristic);
-                    ((OperationActivity) getActivity()).setCharaProp(propList.get(0));
-                    ((OperationActivity) getActivity()).changePage(2);
-                }
+//                if (propList.size() > 1) {
+//                    new AlertDialog.Builder(getActivity())
+//                            .setTitle(getActivity().getString(R.string.select_operation_type)) // 选择操作类型
+//                            .setItems(propNameList.toArray(new String[propNameList.size()]), new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int which) {
+//                                    ((OperationActivity) getActivity()).setBluetoothGattCharacteristic(characteristic);
+//                                    ((OperationActivity) getActivity()).setCharaProp(propList.get(which));
+//                                    ((OperationActivity) getActivity()).changePage(CHAR_OPERATION_PAGE);
+//                                }
+//                            })
+//                            .show();
+//                } else if (propList.size() > 0) {
+//                    ((OperationActivity) getActivity()).setBluetoothGattCharacteristic(characteristic);
+//                    ((OperationActivity) getActivity()).setCharaProp(propList.get(0));
+//                    ((OperationActivity) getActivity()).changePage(CHAR_OPERATION_PAGE);
+//                }
+                ((OperationActivity) getActivity()).setBluetoothGattCharacteristic(characteristic);
+                ((OperationActivity) getActivity()).setCharaProp(propList.get(0));
+                ((OperationActivity) getActivity()).changePage(CHAR_OPERATION_PAGE);
 
             }
         });
@@ -187,7 +195,7 @@ public class CharacteristicListFragment extends Fragment{
                 property.delete(property.length() - 2, property.length() - 1);
             }
             if (property.length() > 0) {
-                holder.txt_char_type.setText(String.valueOf(getActivity().getString(R.string.characteristic) + "(" +property.toString() + ")"));
+                holder.txt_char_type.setText(String.valueOf(getActivity().getString(R.string.property) + "(" +property.toString() + ")"));
                 holder.img_char_enter.setVisibility(View.VISIBLE);
             } else {
                 holder.img_char_enter.setVisibility(View.INVISIBLE);

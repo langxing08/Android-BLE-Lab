@@ -22,9 +22,9 @@ public class OperationActivity extends AppCompatActivity implements Observer {
 
     private static final String TAG = "OperationActivity";
 
-    private static final int SERVICE_LIST_PAGE = 0;
-    private static final int CHAR_LIST_PAGE = 1;
-    private static final int CHAR_OPERATION_PAGE = 2;
+    public static final int SERVICE_LIST_PAGE = 0;
+    public static final int CHAR_LIST_PAGE = 1;
+    public static final int CHAR_OPERATION_PAGE = 2;
 
     public static final String KEY_DATA = "key_data";
 

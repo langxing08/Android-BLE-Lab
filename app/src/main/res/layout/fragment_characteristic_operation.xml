@@ -1,14 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Characteristic Operate UI -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#d8e0e8">
 
+    <!-- Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#666666">
+
+        <!-- 数据格式 下拉列表 -->
+        <Spinner
+            android:id="@+id/char_read_fmt_select"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"/>
+
+        <!-- Notify/Indicate 使能/禁用 Button -->
+        <ToggleButton
+            android:id="@+id/char_notify_indicate_enable_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/char_read_fmt_select"
+            android:textColor="#FFFFFF"
+            android:textOn="使能"
+            android:textOff="禁用"
+            android:textSize="15sp"/>
+
+        <!-- 清屏按钮 -->
+        <Button
+            android:id="@+id/char_clear_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@id/char_read_btn"
+            android:layout_marginEnd="10dp"
+            android:text="清空"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"/>
+
+        <!-- 读取数据按钮 -->
+        <Button
+            android:id="@+id/char_read_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="读取"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"/>
+
+    </RelativeLayout>
+
+    <!-- 聊天信息区域 -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/char_msg_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Write区域, 包括发送定时、发送按钮 -->
     <LinearLayout
-        android:id="@+id/layout_container"
+        android:id="@+id/char_writable_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" />
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <!-- 定时发送 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/send_onTime_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="定时发送"/>
+
+            <EditText
+                android:id="@+id/send_onTime_et"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:inputType="numberDecimal"
+                android:text="1000"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ms"/>
+
+        </LinearLayout>
+
+        <!-- 发送, 包括数据格式选择、文本输入框和按钮等3部分 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- 数据格式 下拉列表-->
+            <Spinner
+                android:id="@+id/char_write_fmt_select"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"/>
+
+            <!-- 文本输入框, 3选1 -->
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <!-- UTF-8 -->
+                <EditText
+                    android:id="@+id/char_write_string_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Type something here"
+                    android:textSize="16sp"/>
+
+                <!-- HEX -->
+                <EditText
+                    android:id="@+id/char_write_hex_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:digits="0123456789abcdef"
+                    android:textSize="16sp"
+                    android:visibility="gone"/>
+
+                <!-- DEC -->
+                <EditText
+                    android:id="@+id/char_write_dec_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:textSize="16sp"
+                    android:visibility="gone"/>
+
+            </FrameLayout>
+
+            <!-- 发送按钮 -->
+            <Button
+                android:id="@+id/char_write_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/characteristic_write"
+                android:textSize="18sp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
 
 </LinearLayout>

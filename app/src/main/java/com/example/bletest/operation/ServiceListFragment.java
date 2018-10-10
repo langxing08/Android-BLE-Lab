@@ -1,8 +1,10 @@
 package com.example.bletest.operation;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,6 +26,9 @@ import com.example.bletest.tool.SampleGattAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.bletest.operation.OperationActivity.CHAR_LIST_PAGE;
+
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class ServiceListFragment extends Fragment {
 
     private TextView txtServiceName;
@@ -54,7 +59,7 @@ public class ServiceListFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 BluetoothGattService service = mResultAdapter.getItem(position);
                 ((OperationActivity) getActivity()).setBluetoothGattService(service);
-                ((OperationActivity) getActivity()).changePage(1);
+                ((OperationActivity) getActivity()).changePage(CHAR_LIST_PAGE);
             }
         });
     }
@@ -68,7 +73,7 @@ public class ServiceListFragment extends Fragment {
         BluetoothGatt gatt = BleManager.getInstance().getBluetoothGatt(bleDevice);
 
         txtServiceName.setText(String.valueOf("设备名称: " + name));
-        txtServiceMac.setText(String.valueOf("MAC Address: " + mac));
+        txtServiceMac.setText(String.valueOf("MAC: " + mac));
 
         mResultAdapter.clear();
         for (BluetoothGattService service : gatt.getServices()) {
@@ -131,7 +136,7 @@ public class ServiceListFragment extends Fragment {
 
             BluetoothGattService service = bluetoothGattServiceList.get(position);
             String uuid = service.getUuid().toString();
-            String type = String.valueOf(service.getType());
+            int type = service.getType();
             
             holder.txt_service_name.setText(SampleGattAttributes.lookup(uuid, "Unknown Service"));
             holder.txt_service_uuid.setText(uuid);
