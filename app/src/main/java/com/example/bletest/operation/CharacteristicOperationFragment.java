@@ -47,6 +47,10 @@ public class CharacteristicOperationFragment extends Fragment {
     public static final int PROPERTY_NOTIFY = 4;
     public static final int PROPERTY_INDICATE = 5;
 
+    private static final int DATA_FMT_STR = 0;  // UTF-8字符串格式
+    private static final int DATA_FMT_HEX = 1;  // 十六进制格式
+    private static final int DATA_FMT_DEC = 2;  // 十进制格式
+
     // 初始化控件
     private List<ChatMsg> mChatMsgList = new ArrayList<>();
     private RecyclerView msgRecyclerView;
@@ -82,6 +86,8 @@ public class CharacteristicOperationFragment extends Fragment {
     }
 
     private void initView(View view) {
+
+
 
         // Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取
         charReadFmtSelect = (Spinner) view.findViewById(R.id.char_read_fmt_select);
@@ -129,6 +135,38 @@ public class CharacteristicOperationFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 charWriteFmtInt = i;
+
+                switch (charWriteFmtInt) {
+                    case DATA_FMT_STR:
+                        charWriteStringEdit.setVisibility(View.VISIBLE);
+                        charWriteHexEdit.setVisibility(View.GONE);
+                        charWriteDecEdit.setVisibility(View.GONE);
+
+                        charWriteStringEdit.setFocusable(true);
+                        charWriteStringEdit.setFocusableInTouchMode(true);
+                        charWriteStringEdit.requestFocus();
+                        break;
+
+                    case DATA_FMT_HEX:
+                        charWriteStringEdit.setVisibility(View.GONE);
+                        charWriteHexEdit.setVisibility(View.VISIBLE);
+                        charWriteDecEdit.setVisibility(View.GONE);
+
+                        charWriteHexEdit.setFocusable(true);
+                        charWriteHexEdit.setFocusableInTouchMode(true);
+                        charWriteHexEdit.requestFocus();
+                        break;
+
+                    case DATA_FMT_DEC:
+                        charWriteStringEdit.setVisibility(View.GONE);
+                        charWriteHexEdit.setVisibility(View.GONE);
+                        charWriteDecEdit.setVisibility(View.VISIBLE);
+
+                        charWriteDecEdit.setFocusable(true);
+                        charWriteDecEdit.setFocusableInTouchMode(true);
+                        charWriteDecEdit.requestFocus();
+                        break;
+                }
             }
 
             @Override
@@ -136,7 +174,8 @@ public class CharacteristicOperationFragment extends Fragment {
 
             }
         });
-        
+
+
     }
 
     public void showData() {
@@ -144,6 +183,64 @@ public class CharacteristicOperationFragment extends Fragment {
         final BluetoothGattCharacteristic characteristic = ((OperationActivity) getActivity()).getBluetoothGattCharacteristic();
         final int charaProp = ((OperationActivity) getActivity()).getCharaProp();
         final String child = characteristic.getUuid().toString() + String.valueOf(charaProp);
+
+        // 发送数据
+        charWriteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String hex = charWriteStringEdit.getText().toString();
+                if (TextUtils.isEmpty(hex)) {
+                    return;
+                }
+
+                BleManager.getInstance().write(
+                        bleDevice,
+                        characteristic.getService().getUuid().toString(),
+                        characteristic.getUuid().toString(),
+                        HexUtil.hexStringToBytes(hex),
+                        new BleWriteCallback() {
+                            @Override
+                            public void onWriteSuccess(final int current, final int total, final byte[] justWrite) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+//                                        addText(txt, "write success, current: " + current
+//                                                + " total: " + total
+//                                                + " justWrite: " + HexUtil.formatHexString(justWrite, true));
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onWriteFailure(final BleException exception) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+//                                        addText(txt, exception.toString());
+                                    }
+                                });
+                            }
+                        }
+                );
+            }
+        });
+
     }
+
+    private void runOnUiThread(Runnable runnable) {
+        if (isAdded() && (getActivity() != null)) {
+            getActivity().runOnUiThread(runnable);
+        }
+    }
+
+//    private void addText(TextView textView, String content) {
+//        textView.append(content);
+//        textView.append("\n");
+//
+//        int offset = textView.getLineCount() * textView.getLineHeight();
+//        if (offset > textView.getHeight()) {
+//            textView.scrollTo(0, offset - textView.getHeight());
+//        }
+//    }
 
 }
