@@ -254,6 +254,16 @@ public class CharacteristicOperationFragment extends Fragment {
                         });
             }
         });
+
+        // 清屏
+        charClearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mChatMsgList.clear();
+                adapter.notifyDataSetChanged();
+                msgRecyclerView.removeAllViews();
+            }
+        });
     }
 
     private void runOnUiThread(Runnable runnable) {
