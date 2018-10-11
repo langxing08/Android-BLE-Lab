@@ -188,7 +188,7 @@ public class CharacteristicOperationFragment extends Fragment {
         charWriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String hex = charWriteStringEdit.getText().toString();
+                final String hex = charWriteStringEdit.getText().toString();
                 if (TextUtils.isEmpty(hex)) {
                     return;
                 }
@@ -204,9 +204,7 @@ public class CharacteristicOperationFragment extends Fragment {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-//                                        addText(txt, "write success, current: " + current
-//                                                + " total: " + total
-//                                                + " justWrite: " + HexUtil.formatHexString(justWrite, true));
+                                        charDisplaySendData(hex);
                                     }
                                 });
                             }
@@ -216,7 +214,6 @@ public class CharacteristicOperationFragment extends Fragment {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-//                                        addText(txt, exception.toString());
                                     }
                                 });
                             }
@@ -233,14 +230,29 @@ public class CharacteristicOperationFragment extends Fragment {
         }
     }
 
-//    private void addText(TextView textView, String content) {
-//        textView.append(content);
-//        textView.append("\n");
-//
-//        int offset = textView.getLineCount() * textView.getLineHeight();
-//        if (offset > textView.getHeight()) {
-//            textView.scrollTo(0, offset - textView.getHeight());
-//        }
-//    }
+
+    /**
+     * RecyclerView中显示发送的数据
+     * @param content
+     */
+    private void charDisplaySendData(String content) {
+        ChatMsg chatMsg = new ChatMsg(content, ChatMsg.TYPE_SENT);
+        mChatMsgList.add(chatMsg);
+        int position = mChatMsgList.size() - 1;     // 获取mChatMsgList最后一行的坐标
+        adapter.notifyItemInserted(position);       // 当有新消息时, 刷新RecyclerView中的显示
+        msgRecyclerView.scrollToPosition(position); // 将RecyclerView定位到最后一行
+    }
+
+    /**
+     * RecyclerView中显示接收的数据
+     * @param content
+     */
+    private void charDisplayRecvData(String content) {
+        ChatMsg chatMsg = new ChatMsg(content, ChatMsg.TYPE_RECEIVED);
+        mChatMsgList.add(chatMsg);
+        int position = mChatMsgList.size() - 1;     // 获取mChatMsgList最后一行的坐标
+        adapter.notifyItemInserted(position);       // 当有新消息时, 刷新RecyclerView中的显示
+        msgRecyclerView.scrollToPosition(position); // 将RecyclerView定位到最后一行
+    }
 
 }
