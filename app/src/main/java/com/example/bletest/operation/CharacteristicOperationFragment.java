@@ -18,10 +18,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.callback.BleIndicateCallback;
@@ -40,6 +43,8 @@ import java.util.List;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class CharacteristicOperationFragment extends Fragment {
+
+    private static final String TAG = "CharacteristicOperation";
 
     public static final int PROPERTY_READ = 1;
     public static final int PROPERTY_WRITE = 2;
@@ -63,7 +68,7 @@ public class CharacteristicOperationFragment extends Fragment {
     private int charWriteFmtInt;    // 发送数据格式
 
     private Spinner charReadFmtSelect;          // 读数据格式选择
-    private Button charNotifyIndicateEnableBtn; // 通知/指示 使能按钮
+    private ToggleButton charNotifyIndicateEnableBtn; // 通知/指示 使能按钮
     private Button charClearBtn;                // 清屏按钮
     private Button charReadBtn;                 // 读数据按钮
 
@@ -91,7 +96,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
         // Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取
         charReadFmtSelect = (Spinner) view.findViewById(R.id.char_read_fmt_select);
-        charNotifyIndicateEnableBtn = (Button) view.findViewById(R.id.char_notify_indicate_enable_btn);
+        charNotifyIndicateEnableBtn = (ToggleButton) view.findViewById(R.id.char_notify_indicate_enable_btn);
         charClearBtn = (Button) view.findViewById(R.id.char_clear_btn);
         charReadBtn = (Button) view.findViewById(R.id.char_read_btn);
 
@@ -252,6 +257,50 @@ public class CharacteristicOperationFragment extends Fragment {
                                 });
                             }
                         });
+            }
+        });
+
+        // 通知(Notify)
+        charNotifyIndicateEnableBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (isChecked) {
+                    BleManager.getInstance().notify(
+                            bleDevice,
+                            characteristic.getService().getUuid().toString(),
+                            characteristic.getUuid().toString(),
+                            new BleNotifyCallback() {
+                                @Override
+                                public void onNotifySuccess() {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onNotifyFailure(final BleException exception) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onCharacteristicChanged(byte[] data) {
+                                    charDisplayRecvData(new String(data));    // UTF-8
+                                //    charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
+                                }
+                            }
+                    );
+                } else {
+                    BleManager.getInstance().stopNotify(
+                            bleDevice,
+                            characteristic.getService().getUuid().toString(),
+                            characteristic.getUuid().toString());
+                }
             }
         });
 
