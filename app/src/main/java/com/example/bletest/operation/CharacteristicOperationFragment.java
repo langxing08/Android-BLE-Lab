@@ -205,6 +205,7 @@ public class CharacteristicOperationFragment extends Fragment {
                                     @Override
                                     public void run() {
                                         charDisplaySendData(hex);
+                                        charWriteStringEdit.setText("");    // 清空输入框中的内容
                                     }
                                 });
                             }
