@@ -184,7 +184,7 @@ public class CharacteristicOperationFragment extends Fragment {
         final int charaProp = ((OperationActivity) getActivity()).getCharaProp();
         final String child = characteristic.getUuid().toString() + String.valueOf(charaProp);
 
-        // 发送数据
+        // 发送(Write)数据
         charWriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -223,6 +223,37 @@ public class CharacteristicOperationFragment extends Fragment {
             }
         });
 
+        // 读取(Read)数据
+        charReadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                BleManager.getInstance().read(
+                        bleDevice,
+                        characteristic.getService().getUuid().toString(),
+                        characteristic.getUuid().toString(),
+                        new BleReadCallback() {
+                            @Override
+                            public void onReadSuccess(final byte[] data) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+//                                        charDisplayRecvData(new String(data));    // UTF-8
+                                        charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onReadFailure(final BleException exception) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                    }
+                                });
+                            }
+                        });
+            }
+        });
     }
 
     private void runOnUiThread(Runnable runnable) {
