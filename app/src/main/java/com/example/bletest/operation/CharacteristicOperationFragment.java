@@ -62,6 +62,10 @@ public class CharacteristicOperationFragment extends Fragment {
     private static final int CHAR_PROPERTY_NO_READ_SELECTED = 0;
     private static final int CHAR_PROPERTY_READ_SELECTED = 1;
 
+    // Notify or Indicate select(如果同时存在, 则为Indicate)
+    private static int charaPropNotifyOrIndicateSelect = CHAR_PROPERTY_NO_NOTIFY_OR_INDICATE_SELECTED;
+    private static int charaPropReadSelect = CHAR_PROPERTY_NO_READ_SELECTED;
+
     // Date Format
     private static final int DATA_FMT_STR = 0;  // UTF-8字符串格式
     private static final int DATA_FMT_HEX = 1;  // 十六进制格式
@@ -202,9 +206,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
         // Property
         int charaProp = characteristic.getProperties();
-        // Notify or Indicate select(如果同时存在, 则为Indicate)
-        int charaPropNotifyOrIndicateSelect = CHAR_PROPERTY_NO_NOTIFY_OR_INDICATE_SELECTED;
-        int charaPropReadSelect = CHAR_PROPERTY_NO_READ_SELECTED;
+
 
 
         // 根据Property判断UI上需要显示的功能
@@ -326,42 +328,88 @@ public class CharacteristicOperationFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 if (isChecked) {
-                    BleManager.getInstance().notify(
-                            bleDevice,
-                            characteristic.getService().getUuid().toString(),
-                            characteristic.getUuid().toString(),
-                            new BleNotifyCallback() {
-                                @Override
-                                public void onNotifySuccess() {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                        }
-                                    });
-                                }
+                    if (charaPropNotifyOrIndicateSelect == CHAR_PROPERTY_NOTIFY_SELECTED) {
+                        // Notify
+                        BleManager.getInstance().notify(
+                                bleDevice,
+                                characteristic.getService().getUuid().toString(),
+                                characteristic.getUuid().toString(),
+                                new BleNotifyCallback() {
+                                    @Override
+                                    public void onNotifySuccess() {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                            }
+                                        });
+                                    }
 
-                                @Override
-                                public void onNotifyFailure(final BleException exception) {
-                                    runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                        }
-                                    });
-                                }
+                                    @Override
+                                    public void onNotifyFailure(final BleException exception) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                            }
+                                        });
+                                    }
 
-                                @Override
-                                public void onCharacteristicChanged(byte[] data) {
-                                    charDisplayRecvData(new String(data));    // UTF-8
-                                //    charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
+                                    @Override
+                                    public void onCharacteristicChanged(byte[] data) {
+                                        charDisplayRecvData(new String(data));    // UTF-8
+                                        //    charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
+                                    }
                                 }
-                            }
-                    );
+                        );
+                    } else if (charaPropNotifyOrIndicateSelect == CHAR_PROPERTY_INDICATE_SELECTED){
+                        // Indicate
+                        BleManager.getInstance().indicate(
+                                bleDevice,
+                                characteristic.getService().getUuid().toString(),
+                                characteristic.getUuid().toString(),
+                                new BleIndicateCallback() {
+                                    @Override
+                                    public void onIndicateSuccess() {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onIndicateFailure(final BleException exception) {
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onCharacteristicChanged(byte[] data) {
+                                        charDisplayRecvData(new String(data));    // UTF-8
+                                        //    charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
+                                    }
+                                }
+                        );
+                    }
+
                 } else {
-                    BleManager.getInstance().stopNotify(
-                            bleDevice,
-                            characteristic.getService().getUuid().toString(),
-                            characteristic.getUuid().toString());
-                }
+                    if (charaPropNotifyOrIndicateSelect == CHAR_PROPERTY_NOTIFY_SELECTED) {
+                        // Stop Notify
+                        BleManager.getInstance().stopNotify(
+                                bleDevice,
+                                characteristic.getService().getUuid().toString(),
+                                characteristic.getUuid().toString());
+                    } else if (charaPropNotifyOrIndicateSelect == CHAR_PROPERTY_INDICATE_SELECTED) {
+                        // Stop Indicate
+                        BleManager.getInstance().stopIndicate(
+                                bleDevice,
+                                characteristic.getService().getUuid().toString(),
+                                characteristic.getUuid().toString());
+                    }
+
+                } // end if (isChecked)
             }
         });
 
