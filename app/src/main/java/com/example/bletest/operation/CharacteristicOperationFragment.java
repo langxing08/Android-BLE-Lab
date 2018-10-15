@@ -109,8 +109,8 @@ public class CharacteristicOperationFragment extends Fragment {
 
         // Write区域, 包括发送定时、发送按钮
         charWritableLayout = (LinearLayout) view.findViewById(R.id.char_writable_layout);
-        sendOnTimeCheckbox = (CheckBox) view.findViewById(R.id.send_onTime_checkbox);
-        sendOnTimeEdit = (EditText) view.findViewById(R.id.send_onTime_et);
+        sendOnTimeCheckbox = (CheckBox) view.findViewById(R.id.char_send_onTime_checkbox);
+        sendOnTimeEdit = (EditText) view.findViewById(R.id.char_send_onTime_et);
         charWriteFmtSelect = (Spinner) view.findViewById(R.id.char_write_fmt_select);
         charWriteStringEdit = (EditText) view.findViewById(R.id.char_write_string_et);
         charWriteHexEdit = (EditText) view.findViewById(R.id.char_write_hex_et);
@@ -180,7 +180,6 @@ public class CharacteristicOperationFragment extends Fragment {
             }
         });
 
-
     }
 
     public void showData() {
@@ -188,6 +187,7 @@ public class CharacteristicOperationFragment extends Fragment {
         final BluetoothGattCharacteristic characteristic = ((OperationActivity) getActivity()).getBluetoothGattCharacteristic();
         final int charaProp = ((OperationActivity) getActivity()).getCharaProp();
         final String child = characteristic.getUuid().toString() + String.valueOf(charaProp);
+
 
         // 发送(Write)数据
         charWriteBtn.setOnClickListener(new View.OnClickListener() {
