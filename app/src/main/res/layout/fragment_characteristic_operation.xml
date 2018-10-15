@@ -9,8 +9,10 @@
 
     <!-- Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取-->
     <RelativeLayout
+        android:id="@+id/char_receivable_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:background="#666666">
 
         <!-- 数据格式 下拉列表 -->
@@ -54,7 +56,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="5dp"
             android:background="@drawable/toggle_drawable_selector"
-            android:text="Notify"
+            android:text="None"
             android:textAllCaps="false"
             android:textAlignment="textStart"
             android:textOn="@null"
@@ -72,11 +74,11 @@
 
     <!-- Write区域, 包括发送定时、发送按钮 -->
     <LinearLayout
-        android:id="@+id/char_writable_layout"
+        android:id="@+id/char_sendable_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <!-- 定时发送 -->
         <LinearLayout

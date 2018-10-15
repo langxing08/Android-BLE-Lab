@@ -21,6 +21,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,12 +47,22 @@ public class CharacteristicOperationFragment extends Fragment {
 
     private static final String TAG = "CharacteristicOperation";
 
+    // Property
     public static final int PROPERTY_READ = 1;
     public static final int PROPERTY_WRITE = 2;
     public static final int PROPERTY_WRITE_NO_RESPONSE = 3;
     public static final int PROPERTY_NOTIFY = 4;
     public static final int PROPERTY_INDICATE = 5;
 
+    // Notify and Indicate Property
+    private static final int CHAR_PROPERTY_NO_NOTIFY_OR_INDICATE_SELECTED = 0;
+    private static final int CHAR_PROPERTY_NOTIFY_SELECTED = 1;
+    private static final int CHAR_PROPERTY_INDICATE_SELECTED = 2;
+
+    private static final int CHAR_PROPERTY_NO_READ_SELECTED = 0;
+    private static final int CHAR_PROPERTY_READ_SELECTED = 1;
+
+    // Date Format
     private static final int DATA_FMT_STR = 0;  // UTF-8字符串格式
     private static final int DATA_FMT_HEX = 1;  // 十六进制格式
     private static final int DATA_FMT_DEC = 2;  // 十进制格式
@@ -67,15 +78,15 @@ public class CharacteristicOperationFragment extends Fragment {
     private int charReadFmtInt;     // 接收数据格式
     private int charWriteFmtInt;    // 发送数据格式
 
+    private RelativeLayout charReceivableLayout;// 接收区域Layout
     private Spinner charReadFmtSelect;          // 读数据格式选择
     private ToggleButton charNotifyIndicateEnableBtn; // 通知/指示 使能按钮
     private Button charClearBtn;                // 清屏按钮
     private Button charReadBtn;                 // 读数据按钮
 
-    private LinearLayout charWritableLayout;    // 写区域Layout
+    private LinearLayout charSendableLayout;    // 发送区域Layout
     private CheckBox sendOnTimeCheckbox;        // 定时发送复选框
     private EditText sendOnTimeEdit;            // 定时发送时间
-
     private Spinner charWriteFmtSelect;         // 写数据格式选择
     private EditText charWriteStringEdit;       // 写数据输入框(UTF-8格式)
     private EditText charWriteHexEdit;          // 写数据输入框(十六进制格式)
@@ -95,6 +106,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
 
         // Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取
+        charReceivableLayout = (RelativeLayout) view.findViewById(R.id.char_receivable_layout);
         charReadFmtSelect = (Spinner) view.findViewById(R.id.char_read_fmt_select);
         charNotifyIndicateEnableBtn = (ToggleButton) view.findViewById(R.id.char_notify_indicate_enable_btn);
         charClearBtn = (Button) view.findViewById(R.id.char_clear_btn);
@@ -108,7 +120,7 @@ public class CharacteristicOperationFragment extends Fragment {
         msgRecyclerView.setAdapter(adapter);
 
         // Write区域, 包括发送定时、发送按钮
-        charWritableLayout = (LinearLayout) view.findViewById(R.id.char_writable_layout);
+        charSendableLayout = (LinearLayout) view.findViewById(R.id.char_sendable_layout);
         sendOnTimeCheckbox = (CheckBox) view.findViewById(R.id.char_send_onTime_checkbox);
         sendOnTimeEdit = (EditText) view.findViewById(R.id.char_send_onTime_et);
         charWriteFmtSelect = (Spinner) view.findViewById(R.id.char_write_fmt_select);
@@ -185,9 +197,58 @@ public class CharacteristicOperationFragment extends Fragment {
     public void showData() {
         final BleDevice bleDevice = ((OperationActivity) getActivity()).getBleDevice();
         final BluetoothGattCharacteristic characteristic = ((OperationActivity) getActivity()).getBluetoothGattCharacteristic();
-        final int charaProp = ((OperationActivity) getActivity()).getCharaProp();
-        final String child = characteristic.getUuid().toString() + String.valueOf(charaProp);
+//        final int charaProp = ((OperationActivity) getActivity()).getCharaProp();
+//        final String child = characteristic.getUuid().toString() + String.valueOf(charaProp);
 
+        // Property
+        int charaProp = characteristic.getProperties();
+        // Notify or Indicate select(如果同时存在, 则为Indicate)
+        int charaPropNotifyOrIndicateSelect = CHAR_PROPERTY_NO_NOTIFY_OR_INDICATE_SELECTED;
+        int charaPropReadSelect = CHAR_PROPERTY_NO_READ_SELECTED;
+
+
+        // 根据Property判断UI上需要显示的功能
+        // Write or Write_no_response
+        if (((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0)
+                || ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) > 0)) {
+            charSendableLayout.setVisibility(View.VISIBLE);
+        } else {
+            charSendableLayout.setVisibility(View.GONE);
+        }
+
+        // Read
+        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+            charaPropReadSelect = CHAR_PROPERTY_READ_SELECTED;
+        }
+
+        // Notify or Indicate
+        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+            charaPropNotifyOrIndicateSelect = CHAR_PROPERTY_NOTIFY_SELECTED;
+        }
+        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_INDICATE) > 0) {
+            charaPropNotifyOrIndicateSelect = CHAR_PROPERTY_INDICATE_SELECTED;
+        }
+        if ((charaPropReadSelect > 0) || (charaPropNotifyOrIndicateSelect > 0)) {
+            charReceivableLayout.setVisibility(View.VISIBLE);
+
+            switch (charaPropNotifyOrIndicateSelect) {
+                case CHAR_PROPERTY_NO_NOTIFY_OR_INDICATE_SELECTED:
+                    charNotifyIndicateEnableBtn.setVisibility(View.GONE);
+                    break;
+                case CHAR_PROPERTY_NOTIFY_SELECTED:
+                    charNotifyIndicateEnableBtn.setVisibility(View.VISIBLE);
+                    charNotifyIndicateEnableBtn.setText("Notify");
+                    break;
+                case CHAR_PROPERTY_INDICATE_SELECTED:
+                    charNotifyIndicateEnableBtn.setVisibility(View.VISIBLE);
+                    charNotifyIndicateEnableBtn.setText("Indicate");
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            charReceivableLayout.setVisibility(View.GONE);
+        }
 
         // 发送(Write)数据
         charWriteBtn.setOnClickListener(new View.OnClickListener() {
