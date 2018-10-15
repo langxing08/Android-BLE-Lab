@@ -63,8 +63,8 @@ public class CharacteristicOperationFragment extends Fragment {
     private static final int CHAR_PROPERTY_READ_SELECTED = 1;
 
     // Notify or Indicate select(如果同时存在, 则为Indicate)
-    private static int charaPropNotifyOrIndicateSelect = CHAR_PROPERTY_NO_NOTIFY_OR_INDICATE_SELECTED;
-    private static int charaPropReadSelect = CHAR_PROPERTY_NO_READ_SELECTED;
+    private static int charaPropNotifyOrIndicateSelect;
+    private static int charaPropReadSelect;
 
     // Date Format
     private static final int DATA_FMT_STR = 0;  // UTF-8字符串格式
@@ -106,8 +106,6 @@ public class CharacteristicOperationFragment extends Fragment {
     }
 
     private void initView(View view) {
-
-
 
         // Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取
         charReceivableLayout = (RelativeLayout) view.findViewById(R.id.char_receivable_layout);
@@ -201,13 +199,11 @@ public class CharacteristicOperationFragment extends Fragment {
     public void showData() {
         final BleDevice bleDevice = ((OperationActivity) getActivity()).getBleDevice();
         final BluetoothGattCharacteristic characteristic = ((OperationActivity) getActivity()).getBluetoothGattCharacteristic();
-//        final int charaProp = ((OperationActivity) getActivity()).getCharaProp();
-//        final String child = characteristic.getUuid().toString() + String.valueOf(charaProp);
 
         // Property
         int charaProp = characteristic.getProperties();
-
-
+        charaPropNotifyOrIndicateSelect = CHAR_PROPERTY_NO_NOTIFY_OR_INDICATE_SELECTED;
+        charaPropReadSelect = CHAR_PROPERTY_NO_READ_SELECTED;
 
         // 根据Property判断UI上需要显示的功能
         // Write or Write_no_response
@@ -251,6 +247,7 @@ public class CharacteristicOperationFragment extends Fragment {
         } else {
             charReceivableLayout.setVisibility(View.GONE);
         }
+        
 
         // 发送(Write)数据
         charWriteBtn.setOnClickListener(new View.OnClickListener() {
@@ -323,7 +320,7 @@ public class CharacteristicOperationFragment extends Fragment {
             }
         });
 
-        // 通知(Notify)
+        // 通知(Notify) or 指示(Indicate)
         charNotifyIndicateEnableBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
@@ -417,9 +414,7 @@ public class CharacteristicOperationFragment extends Fragment {
         charClearBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mChatMsgList.clear();
-                adapter.notifyDataSetChanged();
-                msgRecyclerView.removeAllViews();
+                charDisplayClear();
             }
         });
     }
@@ -430,6 +425,11 @@ public class CharacteristicOperationFragment extends Fragment {
         }
     }
 
+    private void charDisplayClear() {
+        mChatMsgList.clear();
+        adapter.notifyDataSetChanged();
+        msgRecyclerView.removeAllViews();
+    }
 
     /**
      * RecyclerView中显示发送的数据
