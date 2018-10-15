@@ -247,7 +247,9 @@ public class CharacteristicOperationFragment extends Fragment {
         } else {
             charReceivableLayout.setVisibility(View.GONE);
         }
-        
+
+        // 初始化时清屏
+        charDisplayClear();
 
         // 发送(Write)数据
         charWriteBtn.setOnClickListener(new View.OnClickListener() {
