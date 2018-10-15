@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#d8e0e8">
 
-    <!-- Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取-->
+    <!-- Receive 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取-->
     <RelativeLayout
         android:id="@+id/char_receivable_layout"
         android:layout_width="match_parent"
@@ -17,7 +17,7 @@
 
         <!-- 数据格式 下拉列表 -->
         <Spinner
-            android:id="@+id/char_read_fmt_select"
+            android:id="@+id/char_recv_fmt_select"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -29,7 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/char_read_fmt_select"
+            android:layout_toEndOf="@id/char_recv_fmt_select"
             android:layout_marginEnd="10dp"
             android:text="清空"
             android:textAllCaps="false"
@@ -72,7 +72,7 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Write区域, 包括发送定时、发送按钮 -->
+    <!-- Send 区域, 包括发送定时、发送按钮 -->
     <LinearLayout
         android:id="@+id/char_sendable_layout"
         android:layout_width="match_parent"
@@ -117,7 +117,7 @@
 
             <!-- 数据格式 下拉列表-->
             <Spinner
-                android:id="@+id/char_write_fmt_select"
+                android:id="@+id/char_send_fmt_select"
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"/>
 

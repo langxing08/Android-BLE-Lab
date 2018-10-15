@@ -79,19 +79,19 @@ public class CharacteristicOperationFragment extends Fragment {
 
     private ArrayAdapter<String> fmtAdapter;    // 数据格式Adapter
     private static final String FMT_SELECT[] = { "Str", "Hex", "Dec" };
-    private int charReadFmtInt;     // 接收数据格式
-    private int charWriteFmtInt;    // 发送数据格式
+    private int charRecvFmtInt; // 接收数据格式
+    private int charSendFmtInt; // 发送数据格式
 
     private RelativeLayout charReceivableLayout;// 接收区域Layout
-    private Spinner charReadFmtSelect;          // 读数据格式选择
+    private Spinner charRecvFmtSelect;          // 读数据格式选择
     private ToggleButton charNotifyIndicateEnableBtn; // 通知/指示 使能按钮
     private Button charClearBtn;                // 清屏按钮
     private Button charReadBtn;                 // 读数据按钮
 
     private LinearLayout charSendableLayout;    // 发送区域Layout
-    private CheckBox sendOnTimeCheckbox;        // 定时发送复选框
-    private EditText sendOnTimeEdit;            // 定时发送时间
-    private Spinner charWriteFmtSelect;         // 写数据格式选择
+    private CheckBox charSendOnTimeCheckbox;    // 定时发送复选框
+    private EditText charSendOnTimeEdit;        // 定时发送时间
+    private Spinner charSendFmtSelect;         // 写数据格式选择
     private EditText charWriteStringEdit;       // 写数据输入框(UTF-8格式)
     private EditText charWriteHexEdit;          // 写数据输入框(十六进制格式)
     private EditText charWriteDecEdit;          // 写数据输入框(十进制格式)
@@ -107,9 +107,9 @@ public class CharacteristicOperationFragment extends Fragment {
 
     private void initView(View view) {
 
-        // Read 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取
+        // Receive 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取
         charReceivableLayout = (RelativeLayout) view.findViewById(R.id.char_receivable_layout);
-        charReadFmtSelect = (Spinner) view.findViewById(R.id.char_read_fmt_select);
+        charRecvFmtSelect = (Spinner) view.findViewById(R.id.char_recv_fmt_select);
         charNotifyIndicateEnableBtn = (ToggleButton) view.findViewById(R.id.char_notify_indicate_enable_btn);
         charClearBtn = (Button) view.findViewById(R.id.char_clear_btn);
         charReadBtn = (Button) view.findViewById(R.id.char_read_btn);
@@ -121,11 +121,11 @@ public class CharacteristicOperationFragment extends Fragment {
         adapter = new ChatMsgAdapter(mChatMsgList);
         msgRecyclerView.setAdapter(adapter);
 
-        // Write区域, 包括发送定时、发送按钮
+        // Send区域, 包括发送定时、发送按钮
         charSendableLayout = (LinearLayout) view.findViewById(R.id.char_sendable_layout);
-        sendOnTimeCheckbox = (CheckBox) view.findViewById(R.id.char_send_onTime_checkbox);
-        sendOnTimeEdit = (EditText) view.findViewById(R.id.char_send_onTime_et);
-        charWriteFmtSelect = (Spinner) view.findViewById(R.id.char_write_fmt_select);
+        charSendOnTimeCheckbox = (CheckBox) view.findViewById(R.id.char_send_onTime_checkbox);
+        charSendOnTimeEdit = (EditText) view.findViewById(R.id.char_send_onTime_et);
+        charSendFmtSelect = (Spinner) view.findViewById(R.id.char_send_fmt_select);
         charWriteStringEdit = (EditText) view.findViewById(R.id.char_write_string_et);
         charWriteHexEdit = (EditText) view.findViewById(R.id.char_write_hex_et);
         charWriteDecEdit = (EditText) view.findViewById(R.id.char_write_dec_et);
@@ -135,11 +135,11 @@ public class CharacteristicOperationFragment extends Fragment {
         fmtAdapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, FMT_SELECT);
         fmtAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        charReadFmtSelect.setAdapter(fmtAdapter);
-        charReadFmtSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        charRecvFmtSelect.setAdapter(fmtAdapter);
+        charRecvFmtSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                charReadFmtInt = i;
+                charRecvFmtInt = i;
             }
 
             @Override
@@ -149,13 +149,13 @@ public class CharacteristicOperationFragment extends Fragment {
         });
 
         // 初始化发送数据格式
-        charWriteFmtSelect.setAdapter(fmtAdapter);
-        charWriteFmtSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        charSendFmtSelect.setAdapter(fmtAdapter);
+        charSendFmtSelect.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                charWriteFmtInt = i;
+                charSendFmtInt = i;
 
-                switch (charWriteFmtInt) {
+                switch (charSendFmtInt) {
                     case DATA_FMT_STR:
                         charWriteStringEdit.setVisibility(View.VISIBLE);
                         charWriteHexEdit.setVisibility(View.GONE);
@@ -227,8 +227,17 @@ public class CharacteristicOperationFragment extends Fragment {
             charaPropNotifyOrIndicateSelect = CHAR_PROPERTY_INDICATE_SELECTED;
         }
         if ((charaPropReadSelect > 0) || (charaPropNotifyOrIndicateSelect > 0)) {
+            // 初始化接收区域
             charReceivableLayout.setVisibility(View.VISIBLE);
 
+            // 初始化Read Button
+            if (charaPropReadSelect > 0) {
+                charReadBtn.setVisibility(View.VISIBLE);
+            } else {
+                charReadBtn.setVisibility(View.GONE);
+            }
+
+            // 初始化Notify or Indicate Enable/Disable ToggleButton
             switch (charaPropNotifyOrIndicateSelect) {
                 case CHAR_PROPERTY_NO_NOTIFY_OR_INDICATE_SELECTED:
                     charNotifyIndicateEnableBtn.setVisibility(View.GONE);
@@ -245,13 +254,14 @@ public class CharacteristicOperationFragment extends Fragment {
                     break;
             }
         } else {
+            // 初始化接收区域
             charReceivableLayout.setVisibility(View.GONE);
         }
 
         // 初始化时清屏
         charDisplayClear();
 
-        // 发送(Write)数据
+        // 发送(Write)数据 Button
         charWriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -290,7 +300,7 @@ public class CharacteristicOperationFragment extends Fragment {
             }
         });
 
-        // 读取(Read)数据
+        // 读取(Read)数据 Button
         charReadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -322,7 +332,7 @@ public class CharacteristicOperationFragment extends Fragment {
             }
         });
 
-        // 通知(Notify) or 指示(Indicate)
+        // 通知(Notify) or 指示(Indicate) ToggleButton
         charNotifyIndicateEnableBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
