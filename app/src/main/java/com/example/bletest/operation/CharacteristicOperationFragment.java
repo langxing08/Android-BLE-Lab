@@ -266,8 +266,8 @@ public class CharacteristicOperationFragment extends Fragment {
         charWriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final String hex = charWriteStringEdit.getText().toString();
-                if (TextUtils.isEmpty(hex)) {
+                final byte[] sendMsg = getSendData();
+                if (sendMsg == null) {
                     return;
                 }
 
@@ -275,15 +275,14 @@ public class CharacteristicOperationFragment extends Fragment {
                         bleDevice,
                         characteristic.getService().getUuid().toString(),
                         characteristic.getUuid().toString(),
-                        HexUtil.hexStringToBytes(hex),
+                        sendMsg,
                         new BleWriteCallback() {
                             @Override
                             public void onWriteSuccess(final int current, final int total, final byte[] justWrite) {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        charDisplaySendData(hex);
-                                        charWriteStringEdit.setText("");    // 清空输入框中的内容
+                                        charDisplaySendData(sendMsg);
                                     }
                                 });
                             }
@@ -364,8 +363,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
                                     @Override
                                     public void onCharacteristicChanged(byte[] data) {
-                                        //charDisplayRecvData(new String(data));    // UTF-8
-                                        //    charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
+                                        charDisplayRecvData(data);
                                     }
                                 }
                         );
@@ -396,7 +394,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
                                     @Override
                                     public void onCharacteristicChanged(byte[] data) {
-                                    //    charDisplayRecvData(data);
+                                        charDisplayRecvData(data);
                                     }
 
                                 }
@@ -437,6 +435,9 @@ public class CharacteristicOperationFragment extends Fragment {
         }
     }
 
+    /**
+     * RecyclerView中清屏
+     */
     private void charDisplayClear() {
         mChatMsgList.clear();
         adapter.notifyDataSetChanged();
@@ -444,10 +445,77 @@ public class CharacteristicOperationFragment extends Fragment {
     }
 
     /**
-     * RecyclerView中显示发送的数据
-     * @param content
+     * 从EditText获取要发送的数据
+     * @return
      */
-    private void charDisplaySendData(String content) {
+    private byte[] getSendData() {
+        String content = "";
+        byte[] sendMsgByte = null;
+
+        switch (charSendFmtInt) {
+            case DATA_FMT_STR:  // 字符串
+                content = charWriteStringEdit.getText().toString();
+                if (TextUtils.isEmpty(content)) {
+                    return null;
+                }
+
+                sendMsgByte = content.getBytes();
+                break;
+            case DATA_FMT_HEX:  // 16进制
+                content = charWriteHexEdit.getText().toString();
+                if (TextUtils.isEmpty(content)) {
+                    return null;
+                }
+
+                sendMsgByte = HexUtil.hexStringToBytes(content);
+                break;
+            case DATA_FMT_DEC:  // 10进制
+                content = charWriteDecEdit.getText().toString();
+                if (TextUtils.isEmpty(content)) {
+                    return null;
+                }
+
+                int dataInteger = Integer.parseInt(content);
+                int byteSize;
+                for (byteSize = 0; dataInteger != 0; byteSize++) {  // 计算占用字节数
+                    dataInteger /= 256;
+                }
+                sendMsgByte = new byte[byteSize];
+
+                dataInteger = Integer.parseInt(content);
+                for (int i = 0; i < byteSize; i++) {
+                sendMsgByte[i] = (byte) (0xFF & (dataInteger % 256));
+                dataInteger /= 256;
+            }
+                break;
+        }
+
+        return sendMsgByte;
+    }
+
+    /**
+     * RecyclerView中显示发送的数据
+     * @param data
+     */
+    private void charDisplaySendData(final byte[] data) {
+
+        String content = "";
+
+        switch (charSendFmtInt) {
+            case DATA_FMT_STR:  // 字符串
+                content = charWriteStringEdit.getText().toString();
+                charWriteStringEdit.setText("");  // 清空输入框中的内容
+                break;
+            case DATA_FMT_HEX:  // 16进制
+                content = charWriteHexEdit.getText().toString();
+                charWriteHexEdit.setText("");
+                break;
+            case DATA_FMT_DEC:  // 10进制
+                content = charWriteDecEdit.getText().toString();
+                charWriteDecEdit.setText("");
+                break;
+        }
+
         ChatMsg chatMsg = new ChatMsg(content, ChatMsg.TYPE_SENT);
         mChatMsgList.add(chatMsg);
         int position = mChatMsgList.size() - 1;     // 获取mChatMsgList最后一行的坐标
@@ -466,10 +534,10 @@ public class CharacteristicOperationFragment extends Fragment {
             case DATA_FMT_STR:  // 字符串
                 tmp = new String(data);
                 break;
-            case DATA_FMT_HEX:  // 十六进制
+            case DATA_FMT_HEX:  // 16进制
                 tmp = HexUtil.formatHexString(data, true);
                 break;
-            case DATA_FMT_DEC:  // 十进制
+            case DATA_FMT_DEC:  // 10进制
                 int count = 0;
                 for (int i = 0; i < data.length; i++) {
                     count *= 256;
