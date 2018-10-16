@@ -39,6 +39,7 @@ import com.example.bletest.ChatMsg;
 import com.example.bletest.R;
 import com.example.bletest.adapter.ChatMsgAdapter;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -314,8 +315,7 @@ public class CharacteristicOperationFragment extends Fragment {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-//                                        charDisplayRecvData(new String(data));    // UTF-8
-                                        charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
+                                        charDisplayRecvData(data);
                                     }
                                 });
                             }
@@ -364,7 +364,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
                                     @Override
                                     public void onCharacteristicChanged(byte[] data) {
-                                        charDisplayRecvData(new String(data));    // UTF-8
+                                        //charDisplayRecvData(new String(data));    // UTF-8
                                         //    charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
                                     }
                                 }
@@ -396,9 +396,9 @@ public class CharacteristicOperationFragment extends Fragment {
 
                                     @Override
                                     public void onCharacteristicChanged(byte[] data) {
-                                        charDisplayRecvData(new String(data));    // UTF-8
-                                        //    charDisplayRecvData(HexUtil.formatHexString(data, true));   // HEX
+                                    //    charDisplayRecvData(data);
                                     }
+
                                 }
                         );
                     }
@@ -457,10 +457,29 @@ public class CharacteristicOperationFragment extends Fragment {
 
     /**
      * RecyclerView中显示接收的数据
-     * @param content
+     * @param data
      */
-    private void charDisplayRecvData(String content) {
-        ChatMsg chatMsg = new ChatMsg(content, ChatMsg.TYPE_RECEIVED);
+    private void charDisplayRecvData(byte[] data) {
+        String tmp = "";
+
+        switch (charRecvFmtInt) {
+            case DATA_FMT_STR:  // 字符串
+                tmp = new String(data);
+                break;
+            case DATA_FMT_HEX:  // 十六进制
+                tmp = HexUtil.formatHexString(data, true);
+                break;
+            case DATA_FMT_DEC:  // 十进制
+                int count = 0;
+                for (int i = 0; i < data.length; i++) {
+                    count *= 256;
+                    count += (data[data.length - 1 - i] & 0xFF);
+                }
+                tmp = Integer.toString(count);
+                break;
+        }
+
+        ChatMsg chatMsg = new ChatMsg(tmp, ChatMsg.TYPE_RECEIVED);
         mChatMsgList.add(chatMsg);
         int position = mChatMsgList.size() - 1;     // 获取mChatMsgList最后一行的坐标
         adapter.notifyItemInserted(position);       // 当有新消息时, 刷新RecyclerView中的显示
