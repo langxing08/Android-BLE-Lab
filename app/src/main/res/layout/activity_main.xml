@@ -16,39 +16,18 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         android:title="@string/app_name" />
 
-    <!-- 用于显示应用处于正在扫描BLE设备的状态 -->
-    <LinearLayout
-        android:id="@+id/device_scan_logo_layout"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/loading_img"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="10dp"
-            android:src="@mipmap/ic_loading"
-            android:contentDescription="@string/device_scanning"/>
-
-        <TextView
-            android:id="@+id/device_scanning_txt"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="10dp"
-            android:gravity="center"
-            android:text="@string/device_scanning"
-            android:textStyle="bold"
-            android:textSize="14sp"/>
-
-    </LinearLayout>
-
     <!-- 用于显示扫描到的BLE设备 -->
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/device_recycler_view"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/device_swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/device_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
 </LinearLayout>

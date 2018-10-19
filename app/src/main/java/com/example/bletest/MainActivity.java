@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,15 +55,14 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int BLE_STOP_SCAN_STATUS = 0;
     private int bleScanStatus = BLE_STOP_SCAN_STATUS;   // BLE扫描状态标志位
 
-    private LinearLayout deviceScanLayout;  // 设备扫描Layout,包括图片和文字
-    private ImageView loadingImageView;     // 设备扫描图片
-    private Animation operatingAnim;        // 设备扫描图片动画效果
-
     private MenuItem scanMenuItem;          // 工具栏中的菜单
 
     public DeviceAdapter mDeviceAdapter;    // 设备适配器
 
     private ProgressDialog progressDialog;  // 设备连接进度条
+
+    private SwipeRefreshLayout swipeRefreshLayout;  // 下拉刷新Layout, 用于下拉扫描BLE设备
+    private RecyclerView recyclerView;      // RecyclerView, 用于显示扫描到的BLE设备
 
     private List<BleDevice> bleDeviceList = new ArrayList<>();
 
@@ -134,13 +134,19 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         Toolbar toolbar = (Toolbar) findViewById(R.id.device_toolbar);
         setSupportActionBar(toolbar);
 
-        deviceScanLayout = (LinearLayout) findViewById(R.id.device_scan_logo_layout);
-        loadingImageView = (ImageView) findViewById(R.id.loading_img);
-        operatingAnim = AnimationUtils.loadAnimation(this, R.anim.rotate);
-        operatingAnim.setInterpolator(new LinearInterpolator());
         progressDialog = new ProgressDialog(this);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.device_recycler_view);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.device_swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                bleSetScanRule();
+                bleStartScan();
+            }
+        });
+
+        recyclerView = (RecyclerView) findViewById(R.id.device_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         mDeviceAdapter = new DeviceAdapter(bleDeviceList);
@@ -253,9 +259,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 mDeviceAdapter.clearScanDevice();
                 mDeviceAdapter.notifyDataSetChanged();
 
-                loadingImageView.startAnimation(operatingAnim);
-                deviceScanLayout.setVisibility(View.VISIBLE);
                 scanMenuItem.setTitle(getString(R.string.stop_scan));
+
+                swipeRefreshLayout.setRefreshing(true);
 
                 bleScanStatus = BLE_SCAN_STATUS;
             }
@@ -273,9 +279,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onScanFinished(List<BleDevice> scanResultList) {
-                deviceScanLayout.setVisibility(View.GONE);
-                loadingImageView.clearAnimation();
                 scanMenuItem.setTitle(getString(R.string.start_scan));
+
+                swipeRefreshLayout.setRefreshing(false);
 
                 bleScanStatus = BLE_STOP_SCAN_STATUS;
             }
@@ -295,8 +301,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
-                deviceScanLayout.setVisibility(View.GONE);
-                loadingImageView.clearAnimation();
                 scanMenuItem.setTitle(getString(R.string.start_scan));
 
                 progressDialog.dismiss();
