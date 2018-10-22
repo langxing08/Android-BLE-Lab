@@ -305,12 +305,17 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         BleManager.getInstance().scan(new BleScanCallback() {
             @Override
             public void onScanStarted(boolean success) {
-                mDeviceAdapter.clearScanDevice();
+
+                bleDeviceList.clear();
+
+                mDeviceAdapter.clear();
                 mDeviceAdapter.notifyDataSetChanged();
 
-                scanMenuItem.setTitle(getString(R.string.stop_scan));
+                recyclerView.removeAllViews();
 
                 swipeRefreshLayout.setRefreshing(true);
+
+                scanMenuItem.setTitle(getString(R.string.stop_scan));
 
                 bleScanStatus = BLE_SCAN_STATUS;
             }
