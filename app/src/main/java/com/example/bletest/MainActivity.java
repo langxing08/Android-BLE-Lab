@@ -1,6 +1,7 @@
 package com.example.bletest;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
@@ -9,6 +10,9 @@ import android.content.Intent;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -54,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private static final int BLE_SCAN_STATUS = 1;
     private static final int BLE_STOP_SCAN_STATUS = 0;
     private int bleScanStatus = BLE_STOP_SCAN_STATUS;   // BLE扫描状态标志位
+
+    private DrawerLayout mDrawerLayout;
+    private NavigationView navView;         // 侧滑菜单
 
     private MenuItem scanMenuItem;          // 工具栏中的菜单
 
@@ -109,6 +116,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:  // 侧滑菜单
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                break;
             case R.id.action_scan_item:
                 if (bleScanStatus == BLE_STOP_SCAN_STATUS) { // 开始扫描
                     bleSetScanRule();
@@ -131,8 +141,47 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * View初始化
      */
     private void initView() {
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.device_toolbar);
         setSupportActionBar(toolbar);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.device_drawer_layout);
+        navView = (NavigationView) findViewById(R.id.nav_view);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);  // 显示导航按钮
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);  // 设置导航按钮图标
+        }
+        navView.setCheckedItem(R.id.nav_setting);
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            // 侧滑菜单的菜单项选择事件处理
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.nav_setting:
+                        Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_device_info:
+                        Toast.makeText(MainActivity.this, "Device Information", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_about:
+                        Toast.makeText(MainActivity.this, "About", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_denote:
+                        Toast.makeText(MainActivity.this, "Denote", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_feedback:
+                        Toast.makeText(MainActivity.this, "Feedback", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+
+                mDrawerLayout.closeDrawers();
+                return true;
+            }
+        });
+
 
         progressDialog = new ProgressDialog(this);
 
