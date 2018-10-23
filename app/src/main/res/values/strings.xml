@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BLE Hunter</string>
+    <string name="app_name">BLE Lab</string>
     <string name="show_log">Log</string>
     <string name="device_scanning">正在扫描BLE设备</string>
     <string name="service">服务</string>

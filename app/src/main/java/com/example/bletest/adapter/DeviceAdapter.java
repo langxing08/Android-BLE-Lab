@@ -103,6 +103,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         holder.macTxt.setText(mac);
         holder.rssiTxt.setText(String.valueOf(rssi));
 
+        // 根据不同RSSI等级显示不同的RSSI Logo
         final int rssiPercent = (int) (100.0f * (127.0f + rssi) / (127.0f + 20.0f));
         holder.rssiLogoImg.setImageLevel(rssiPercent);
     }
