@@ -26,6 +26,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         View deviceView;
 
         ImageView bluetoothImg;
+        ImageView rssiLogoImg;
 
         TextView deviceNameTxt;
         TextView macTxt;
@@ -39,6 +40,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             deviceView = view;
 
             bluetoothImg = (ImageView) view.findViewById(R.id.bluetooth_img);
+            rssiLogoImg = (ImageView) view.findViewById(R.id.rssi_logo_img);
             deviceNameTxt = (TextView) view.findViewById(R.id.device_name_txt);
             macTxt = (TextView) view.findViewById(R.id.mac_txt);
             rssiTxt = (TextView) view.findViewById(R.id.rssi_txt);
@@ -100,6 +102,9 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         holder.deviceNameTxt.setText((name == null) || (name.length() == 0) ? "N/A" : name);
         holder.macTxt.setText(mac);
         holder.rssiTxt.setText(String.valueOf(rssi));
+
+        final int rssiPercent = (int) (100.0f * (127.0f + rssi) / (127.0f + 20.0f));
+        holder.rssiLogoImg.setImageLevel(rssiPercent);
     }
 
     @Override

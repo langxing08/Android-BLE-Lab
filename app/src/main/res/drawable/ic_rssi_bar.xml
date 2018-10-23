@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:maxLevel="10" android:drawable="@drawable/ic_rssi_0_bar" />
+    <item android:maxLevel="28" android:drawable="@drawable/ic_rssi_1_bar" />
+    <item android:maxLevel="45" android:drawable="@drawable/ic_rssi_2_bars" />
+    <item android:maxLevel="100" android:drawable="@drawable/ic_rssi_3_bars" />
+</level-list>
