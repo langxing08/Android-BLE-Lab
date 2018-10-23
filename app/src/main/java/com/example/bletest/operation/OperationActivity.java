@@ -2,12 +2,21 @@ package com.example.bletest.operation;
 
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
+import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
 import com.clj.fastble.data.BleDevice;
@@ -32,6 +41,11 @@ public class OperationActivity extends AppCompatActivity implements Observer {
     private BluetoothGattService bluetoothGattService;
     private BluetoothGattCharacteristic bluetoothGattCharacteristic;
     private int charaProp;
+
+    private DrawerLayout mDrawerLayout;
+    private NavigationView navView;         // 侧滑菜单
+
+    private MenuItem connectMenuItem;       // 工具栏中的菜单
 
     private android.support.v7.widget.Toolbar toolbar;
     private List<Fragment> fragmentList = new ArrayList<>();
@@ -86,9 +100,71 @@ public class OperationActivity extends AppCompatActivity implements Observer {
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.device_toolbar, menu);
+        connectMenuItem = menu.findItem(R.id.action_connect_item);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:  // 侧滑菜单
+                mDrawerLayout.openDrawer(GravityCompat.START);
+                break;
+            case R.id.action_scan_item:
+                break;
+            case R.id.action_show_log_item:
+                Toast.makeText(this, "show log", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
     private void initView() {
         toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(titles[0]);
+        setSupportActionBar(toolbar);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.device_drawer_layout);
+        navView = (NavigationView) findViewById(R.id.nav_view);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        }
+        navView.setCheckedItem(R.id.nav_setting);
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            // 侧滑菜单的菜单项选择事件处理
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.nav_setting:
+                        Toast.makeText(OperationActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_device_info:
+                        Toast.makeText(OperationActivity.this, "Device Information", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_about:
+                        Toast.makeText(OperationActivity.this, "About", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_denote:
+                        Toast.makeText(OperationActivity.this, "Denote", Toast.LENGTH_SHORT).show();
+                        break;
+                    case R.id.nav_feedback:
+                        Toast.makeText(OperationActivity.this, "Feedback", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+
+//                mDrawerLayout.closeDrawers();
+                return true;
+            }
+        });
 //        setSupportActionBar(toolbar);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
