@@ -48,7 +48,7 @@ public class OperationActivity extends AppCompatActivity implements Observer {
     private android.support.v7.widget.Toolbar toolbar;
     private List<Fragment> fragmentList = new ArrayList<>();
     private int currentPage = 0;
-    private final String[] titles = {"Service List","Char... List","Char... Operation"};
+    private final String[] titles = {"Service List","Char List","Char Operation"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

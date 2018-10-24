@@ -245,11 +245,11 @@ public class CharacteristicOperationFragment extends Fragment {
                     break;
                 case CHAR_PROPERTY_NOTIFY_SELECTED:
                     charNotifyIndicateEnableBtn.setVisibility(View.VISIBLE);
-                    charNotifyIndicateEnableBtn.setText("Notify");
+                    charNotifyIndicateEnableBtn.setText(getActivity().getString(R.string.notify));
                     break;
                 case CHAR_PROPERTY_INDICATE_SELECTED:
                     charNotifyIndicateEnableBtn.setVisibility(View.VISIBLE);
-                    charNotifyIndicateEnableBtn.setText("Indicate");
+                    charNotifyIndicateEnableBtn.setText(getActivity().getString(R.string.indicate));
                     break;
                 default:
                     break;

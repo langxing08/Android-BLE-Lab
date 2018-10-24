@@ -4,16 +4,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#d8e0e8">
+    android:layout_height="match_parent">
 
     <!-- Receive 区域, 包括数据格式选择、Notify/Indicate 使能、清屏、读取-->
     <RelativeLayout
         android:id="@+id/char_receivable_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:background="#666666">
+        android:visibility="gone">
 
         <!-- 数据格式 下拉列表 -->
         <Spinner
@@ -21,7 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:textSize="14sp"/>
 
         <!-- 清屏按钮 -->
         <Button
@@ -31,10 +30,8 @@
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/char_recv_fmt_select"
             android:layout_marginEnd="10dp"
-            android:text="清空"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"/>
+            android:text="@string/clear_screen"
+            android:textSize="14sp"/>
 
         <!-- 读取数据按钮 -->
         <Button
@@ -43,10 +40,8 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@id/char_clear_btn"
             android:layout_centerVertical="true"
-            android:text="读取"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp"/>
+            android:text="@string/read"
+            android:textSize="14sp"/>
 
         <!-- Notify/Indicate 使能/禁用 Button -->
         <ToggleButton
@@ -56,7 +51,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="5dp"
             android:background="@drawable/toggle_drawable_selector"
-            android:text="None"
+            android:textSize="14sp"
             android:textAllCaps="false"
             android:textAlignment="textStart"
             android:textOn="@null"
@@ -92,7 +87,7 @@
                 android:id="@+id/char_send_onTime_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="定时发送"/>
+                android:text="@string/write_onTime"/>
 
             <EditText
                 android:id="@+id/char_send_onTime_et"
@@ -100,12 +95,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:inputType="numberDecimal"
-                android:text="1000"/>
+                android:hint="@string/write_onTime_time"
+                android:text="@string/write_onTime_time"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ms"/>
+                android:text="@string/write_onTime_unit"/>
 
         </LinearLayout>
 
@@ -118,8 +114,9 @@
             <!-- 数据格式 下拉列表-->
             <Spinner
                 android:id="@+id/char_send_fmt_select"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"/>
 
             <!-- 文本输入框, 3选1 -->
             <FrameLayout
@@ -132,8 +129,8 @@
                     android:id="@+id/char_write_string_et"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Type something here"
-                    android:textSize="16sp"/>
+                    android:hint="@string/string_hint"
+                    android:textSize="14sp"/>
 
                 <!-- HEX -->
                 <EditText
@@ -141,8 +138,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:digits="0123456789abcdef"
-                    android:hint="0123456789abcdef"
-                    android:textSize="16sp"
+                    android:hint="@string/hex_hint"
+                    android:textSize="14sp"
                     android:visibility="gone"/>
 
                 <!-- DEC -->
@@ -151,7 +148,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="number"
-                    android:textSize="16sp"
+                    android:hint="@string/dec_hint"
+                    android:textSize="14sp"
                     android:visibility="gone"/>
 
             </FrameLayout>
@@ -162,13 +160,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="@string/characteristic_write"
-                android:textSize="18sp"/>
+                android:text="@string/write"
+                android:textSize="14sp"/>
 
         </LinearLayout>
 
     </LinearLayout>
-
-
 
 </LinearLayout>
