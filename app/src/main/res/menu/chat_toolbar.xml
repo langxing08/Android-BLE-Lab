@@ -9,7 +9,7 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
     app:showAsAction="ifRoom" />
 
 <item
-    android:id="@+id/action_show_log_item"
+    android:id="@+id/action_chat_show_log_item"
     android:title="@string/show_log"
     android:orderInCategory="2"
     app:showAsAction="never" />

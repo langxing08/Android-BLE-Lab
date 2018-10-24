@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,15 +43,12 @@ public class OperationActivity extends AppCompatActivity implements Observer {
     private BluetoothGattCharacteristic bluetoothGattCharacteristic;
     private int charaProp;
 
-    private DrawerLayout mDrawerLayout;
-    private NavigationView navView;         // 侧滑菜单
-
     private MenuItem connectMenuItem;       // 工具栏中的菜单
 
     private android.support.v7.widget.Toolbar toolbar;
     private List<Fragment> fragmentList = new ArrayList<>();
     private int currentPage = 0;
-    private String[] titles = new String[3];
+    private final String[] titles = {"Service List","Char... List","Char... Operation"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +100,7 @@ public class OperationActivity extends AppCompatActivity implements Observer {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.device_toolbar, menu);
+        getMenuInflater().inflate(R.menu.chat_toolbar, menu);
         connectMenuItem = menu.findItem(R.id.action_connect_item);
         return true;
     }
@@ -110,12 +108,10 @@ public class OperationActivity extends AppCompatActivity implements Observer {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:  // 侧滑菜单
-                mDrawerLayout.openDrawer(GravityCompat.START);
+            case R.id.action_connect_item:
+                Toast.makeText(this, "connect", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.action_scan_item:
-                break;
-            case R.id.action_show_log_item:
+            case R.id.action_chat_show_log_item:
                 Toast.makeText(this, "show log", Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -125,59 +121,25 @@ public class OperationActivity extends AppCompatActivity implements Observer {
     }
 
     private void initView() {
-        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(titles[0]);
         setSupportActionBar(toolbar);
-
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.device_drawer_layout);
-        navView = (NavigationView) findViewById(R.id.nav_view);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-        }
-        navView.setCheckedItem(R.id.nav_setting);
-        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            // 侧滑菜单的菜单项选择事件处理
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getItemId()) {
-                    case R.id.nav_setting:
-                        Toast.makeText(OperationActivity.this, "Settings", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.nav_device_info:
-                        Toast.makeText(OperationActivity.this, "Device Information", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.nav_about:
-                        Toast.makeText(OperationActivity.this, "About", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.nav_denote:
-                        Toast.makeText(OperationActivity.this, "Denote", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.nav_feedback:
-                        Toast.makeText(OperationActivity.this, "Feedback", Toast.LENGTH_SHORT).show();
-                        break;
-                    default:
-                        break;
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (currentPage != SERVICE_LIST_PAGE) {
+                        currentPage--;
+                        changePage(currentPage);
+                    } else {
+                        finish();
+                    }
                 }
+            });
+        }
 
-//                mDrawerLayout.closeDrawers();
-                return true;
-            }
-        });
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (currentPage != SERVICE_LIST_PAGE) {
-//                    currentPage--;
-//                    changePage(currentPage);
-//                } else {
-//                    finish();
-//                }
-//            }
-//        });
     }
 
     private void initData() {
@@ -185,8 +147,6 @@ public class OperationActivity extends AppCompatActivity implements Observer {
         if (bleDevice == null) {
             finish();
         }
-
-        titles = new String[] {"服务列表","特征值列表","操作控制台"};
     }
 
     private void initPage() {
