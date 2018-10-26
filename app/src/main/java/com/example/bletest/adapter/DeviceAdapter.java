@@ -64,7 +64,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 BleDevice bleDevice = mBleDeviceList.get(position);
-                Toast.makeText(view.getContext(), "click view " + bleDevice.getName() , Toast.LENGTH_SHORT).show();
+//                Toast.makeText(view.getContext(), "click view " + bleDevice.getName() , Toast.LENGTH_SHORT).show();
 
                 if (mListener != null) {
                     mListener.onDetail(bleDevice);
@@ -77,7 +77,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 BleDevice bleDevice = mBleDeviceList.get(position);
-                Toast.makeText(view.getContext(), "click button " + bleDevice.getName() , Toast.LENGTH_SHORT).show();
+//                Toast.makeText(view.getContext(), "click button " + bleDevice.getName() , Toast.LENGTH_SHORT).show();
 
                 if (mListener != null) {
                     mListener.onConnect(bleDevice);
