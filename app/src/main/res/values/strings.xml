@@ -21,6 +21,10 @@
     <string name="string_hint">Type something here</string>
     <string name="hex_hint">0123456789abcdef</string>
     <string name="dec_hint">100</string>
+    <string name="about">About</string>
+    <string name="about_details"><b>BLE Lab</b> is a generic tool which is designed for
+        BLE(Bluetooth Low Energy) debug. It support BLE Scan and Connection.
+        \n<b>V1.0.0</b></string>
 
     <string-array name="decoder">
         <item>Str</item>

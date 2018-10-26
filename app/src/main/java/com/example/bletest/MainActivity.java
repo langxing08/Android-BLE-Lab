@@ -2,10 +2,12 @@ package com.example.bletest;
 
 import android.Manifest;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGatt;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
@@ -165,7 +167,18 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         Toast.makeText(MainActivity.this, "Device Information", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.nav_about:
-                        Toast.makeText(MainActivity.this, "About", Toast.LENGTH_SHORT).show();
+                        // 弹出AlertDialog
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                        dialog.setTitle(R.string.about);
+                        dialog.setIcon(R.mipmap.icon);
+                        dialog.setMessage(R.string.about_details);
+                        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                        dialog.show();
+
                         break;
                     case R.id.nav_denote:
                         Toast.makeText(MainActivity.this, "Denote", Toast.LENGTH_SHORT).show();
