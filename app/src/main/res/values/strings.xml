@@ -32,7 +32,7 @@
     <string name="feedback">Feedback</string>
     <string name="feedback_details">If you found any bug, or you have new idea for this App,
         welcome email me, 1055942474@qq.com\nYou can also get the source code on Github.\n
-        https://github.com/langxing08/bletest</string>
+        https://github.com/langxing08/BLE-Lab</string>
 
     <string-array name="decoder">
         <item>Str</item>
