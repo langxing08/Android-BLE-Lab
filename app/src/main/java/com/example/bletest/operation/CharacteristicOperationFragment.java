@@ -4,9 +4,11 @@ import android.annotation.TargetApi;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -38,6 +40,7 @@ import com.clj.fastble.utils.HexUtil;
 import com.example.bletest.ChatMsg;
 import com.example.bletest.R;
 import com.example.bletest.adapter.ChatMsgAdapter;
+import com.example.bletest.tool.Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -97,6 +100,9 @@ public class CharacteristicOperationFragment extends Fragment {
     private EditText charWriteHexEdit;          // 写数据输入框(十六进制格式)
     private EditText charWriteDecEdit;          // 写数据输入框(十进制格式)
     private Button charWriteBtn;                // 写数据按钮
+
+    private AlertDialog.Builder builder = null;
+    private AlertDialog dialog = null;                 // Notify数据弹框
 
     @Nullable
     @Override
@@ -314,7 +320,7 @@ public class CharacteristicOperationFragment extends Fragment {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        charDisplayRecvData(data);
+                                        charDisplayRecvData(data, false, characteristic.getUuid().toString());
                                     }
                                 });
                             }
@@ -363,7 +369,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
                                     @Override
                                     public void onCharacteristicChanged(byte[] data) {
-                                        charDisplayRecvData(data);
+                                        charDisplayRecvData(data, true, characteristic.getUuid().toString());
                                     }
                                 }
                         );
@@ -394,7 +400,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
                                     @Override
                                     public void onCharacteristicChanged(byte[] data) {
-                                        charDisplayRecvData(data);
+                                        charDisplayRecvData(data, true, characteristic.getUuid().toString());
                                     }
 
                                 }
@@ -495,7 +501,7 @@ public class CharacteristicOperationFragment extends Fragment {
 
     /**
      * RecyclerView中显示发送的数据
-     * @param data
+     * @param data  需要显示的数值
      */
     private void charDisplaySendData(final byte[] data) {
 
@@ -525,9 +531,10 @@ public class CharacteristicOperationFragment extends Fragment {
 
     /**
      * RecyclerView中显示接收的数据
-     * @param data
+     * @param data  需要显示的数值
+     * @param toastEnable  Toast使能
      */
-    private void charDisplayRecvData(byte[] data) {
+    private void charDisplayRecvData(byte[] data, boolean toastEnable, String uuid) {
         String tmp = "";
 
         switch (charRecvFmtInt) {
@@ -552,6 +559,11 @@ public class CharacteristicOperationFragment extends Fragment {
         int position = mChatMsgList.size() - 1;     // 获取mChatMsgList最后一行的坐标
         adapter.notifyItemInserted(position);       // 当有新消息时, 刷新RecyclerView中的显示
         msgRecyclerView.scrollToPosition(position); // 将RecyclerView定位到最后一行
+
+        // Toast 显示接收到的数值以及接收数值的UUID
+        if (toastEnable) {
+            Utils.showToast(getActivity(), uuid + ":\n" + tmp);
+        }
     }
 
 }
