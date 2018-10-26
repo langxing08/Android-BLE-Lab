@@ -5,27 +5,30 @@
         <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/ic_settings"
-            android:title="Setting"/>
+            android:visible="false"
+            android:title="@string/setting"/>
 
         <item
             android:id="@+id/nav_device_info"
             android:icon="@drawable/ic_comment"
-            android:title="Device Information"/>
+            android:visible="false"
+            android:title="@string/device_info"/>
 
         <item
             android:id="@+id/nav_about"
             android:icon="@drawable/nav_task"
-            android:title="About"/>
+            android:title="@string/about"/>
 
         <item
             android:id="@+id/nav_denote"
+            android:visible="false"
             android:icon="@drawable/nav_friends"
-            android:title="Denote"/>
+            android:title="@string/denote"/>
 
         <item
             android:id="@+id/nav_feedback"
             android:icon="@drawable/nav_mail"
-            android:title="FeedBack"/>
+            android:title="@string/feedback"/>
     </group>
 
 </menu>
