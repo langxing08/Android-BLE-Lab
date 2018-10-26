@@ -159,6 +159,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             // 侧滑菜单的菜单项选择事件处理
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+
                 switch (menuItem.getItemId()) {
                     case R.id.nav_setting:
                         Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
@@ -168,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         break;
                     case R.id.nav_about:
                         // 弹出AlertDialog
-                        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                         dialog.setTitle(R.string.about);
                         dialog.setIcon(R.mipmap.icon);
                         dialog.setMessage(R.string.about_details);
@@ -184,7 +186,16 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                         Toast.makeText(MainActivity.this, "Denote", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.nav_feedback:
-                        Toast.makeText(MainActivity.this, "Feedback", Toast.LENGTH_SHORT).show();
+                        // 弹出AlertDialog
+                        dialog.setTitle(R.string.feedback);
+                        dialog.setIcon(R.mipmap.icon);
+                        dialog.setMessage(R.string.feedback_details);
+                        dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                            }
+                        });
+                        dialog.show();
                         break;
                     default:
                         break;

@@ -25,6 +25,14 @@
     <string name="about_details"><b>BLE Lab</b> is a generic tool which is designed for
         BLE(Bluetooth Low Energy) debug. It support BLE Scan and Connection.
         \n<b>V1.0.0</b></string>
+    <string name="denote">Denote</string>
+    <string name="denote_details">If this App is useful for
+        and you want to support the subsequent development and maintenance,
+        you can scan Wechat QR code to support me, and I would be grateful.</string>
+    <string name="feedback">Feedback</string>
+    <string name="feedback_details">If you found any bug, or you have new idea for this App,
+        welcome email me, 1055942474@qq.com\nYou can also get the source code on Github.\n
+        https://github.com/langxing08/bletest</string>
 
     <string-array name="decoder">
         <item>Str</item>
