@@ -22,6 +22,11 @@
     <string name="hex_hint">0123456789abcdef</string>
     <string name="dec_hint">100</string>
     <string name="setting">Setting</string>
+    <string name="scan_setting">在下面你可以配置需要扫描的设备的条件,可以为空</string>
+    <string name="setting_name">输入蓝牙设备广播名,多个之间以英文逗号隔开</string>
+    <string name="setting_mac">输入蓝牙设备MAC地址</string>
+    <string name="setting_uuid">输入蓝牙设备UUID,多个之间以英文逗号隔开</string>
+    <string name="setting_auto_reconnect">AutoConnect ?</string>
     <string name="device_info">Device Information</string>
     <string name="about">About</string>
     <string name="about_details"><b>BLE Lab</b> is a generic tool which is designed for

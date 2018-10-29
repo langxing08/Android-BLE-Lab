@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,9 +30,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.clj.fastble.BleManager;
@@ -46,6 +49,7 @@ import com.example.bletest.operation.OperationActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -63,6 +67,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private DrawerLayout mDrawerLayout;
     private NavigationView navView;         // 侧滑菜单
+
+    private LinearLayout settingLayout;     // BLE扫描和连接设置Layout
+    private EditText setNameEdit, setMacEdit, setUuidEdit;  // BLE扫描规则:包括Name、MAC、UUID 等3个Edit
+    private Switch setAutoConnectSw;        // BLE连接规则:自动重连使能开关
 
     private MenuItem scanMenuItem;          // 工具栏中的菜单
 
@@ -148,6 +156,29 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         setSupportActionBar(toolbar);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.device_drawer_layout);
+
+        // BLE扫描和连接Layout
+        settingLayout = (LinearLayout) findViewById(R.id.ble_setting_layout);
+        settingLayout.setVisibility(View.GONE);
+        setNameEdit = (EditText) findViewById(R.id.set_ble_scan_name_et);
+        setMacEdit = (EditText) findViewById(R.id.set_ble_scan_mac_et);
+        setUuidEdit = (EditText) findViewById(R.id.set_ble_scan_uuid_et);
+        setAutoConnectSw = (Switch) findViewById(R.id.set_ble_auto_reconnect_sw);
+
+        // 下拉刷新
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.device_swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        swipeRefreshLayout.setVisibility(View.VISIBLE);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // 下拉刷新实现BLE扫描功能
+                bleSetScanRule();
+                bleStartScan();
+            }
+        });
+
+        // 侧滑菜单
         navView = (NavigationView) findViewById(R.id.nav_view);
         android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -165,6 +196,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 switch (menuItem.getItemId()) {
                     case R.id.nav_setting:
                         Toast.makeText(MainActivity.this, "Settings", Toast.LENGTH_SHORT).show();
+                        settingLayout.setVisibility(View.VISIBLE);
+                        swipeRefreshLayout.setVisibility(View.GONE);
                         break;
                     case R.id.nav_device_info:
                         Toast.makeText(MainActivity.this, "Device Information", Toast.LENGTH_SHORT).show();
@@ -209,16 +242,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         progressDialog = new ProgressDialog(this);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.device_swipe_refresh);
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                // 下拉刷新实现BLE扫描功能
-                bleSetScanRule();
-                bleStartScan();
-            }
-        });
+
 
         recyclerView = (RecyclerView) findViewById(R.id.device_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -313,12 +337,49 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
      * 设置BLE扫描规则
      */
     private void bleSetScanRule() {
+        // UUID
+        String[] uuids;
+        String str_uuid = setUuidEdit.getText().toString();
+        if (TextUtils.isEmpty(str_uuid)) {
+            uuids = null;
+        } else {
+            uuids = str_uuid.split(",");
+        }
+        UUID[] serviceUuids = null;
+        if (uuids != null && uuids.length > 0) {
+            serviceUuids = new UUID[uuids.length];
+            for (int i = 0; i < uuids.length; i++) {
+                String name = uuids[i];
+                String[] components = name.split("-");
+                if (components.length != 5) {
+                    serviceUuids[i] = null;
+                } else {
+                    serviceUuids[i] = UUID.fromString(uuids[i]);
+                }
+            }
+        }
+
+        // Name
+        String[] names;
+        String str_name = setNameEdit.getText().toString();
+        if (TextUtils.isEmpty(str_name)) {
+            names = null;
+        } else {
+            names = str_name.split(",");
+        }
+
+        // MAC
+        String mac = setMacEdit.getText().toString();
+
+        // AutoConnect
+        boolean isAutoConnect = setAutoConnectSw.isChecked();
+
         BleScanRuleConfig scanRuleConfig = new BleScanRuleConfig.Builder()
-             //   .setServiceUuids(null)
-             //   .setDeviceName(false, null)
-             //   .setDeviceMac(null)
-                .setAutoConnect(false)
-                .setScanTimeOut(10000)
+                .setServiceUuids(serviceUuids)      // 只扫描指定的服务的设备,可选
+                .setDeviceName(true, names)    // 只扫描指定广播名的设备,可选
+                .setDeviceMac(mac)                  // 只扫描指定mac的设备,可选
+                .setAutoConnect(isAutoConnect)      // 连接时的autoConnect参数,可选,默认false
+                .setScanTimeOut(10000)              // 扫描超时时间,可选,默认10秒
                 .build();
         BleManager.getInstance().initScanRule(scanRuleConfig);
     }
@@ -338,6 +399,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
                 recyclerView.removeAllViews();
 
+                settingLayout.setVisibility(View.GONE);
+
+                swipeRefreshLayout.setVisibility(View.VISIBLE);
                 swipeRefreshLayout.setRefreshing(true);
 
                 scanMenuItem.setTitle(getString(R.string.stop_scan));

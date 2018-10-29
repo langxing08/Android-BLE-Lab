@@ -26,11 +26,71 @@
 
         </android.support.design.widget.AppBarLayout>
 
+        <!-- 用于设置BLE扫描和连接的相关参数 -->
+        <LinearLayout
+            android:id="@+id/ble_setting_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="10dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/scan_setting"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/set_ble_scan_name_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/setting_name"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/set_ble_scan_mac_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/setting_mac"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/set_ble_scan_uuid_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/setting_uuid"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:textSize="13sp" />
+
+            <Switch
+                android:id="@+id/set_ble_auto_reconnect_sw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="@string/setting_auto_reconnect"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
         <!-- 用于显示扫描到的BLE设备 -->
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/device_swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="visible"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <android.support.v7.widget.RecyclerView
