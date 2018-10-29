@@ -264,7 +264,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         // 检查BLE是否打开
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (!bluetoothAdapter.isEnabled()) {
-            Toast.makeText(this, "请打开手机蓝牙", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You should open Bluetooth", Toast.LENGTH_SHORT).show();
         }
 
         // 所要申请的权限
@@ -279,9 +279,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         // 检查是否已获取该权限
         if (EasyPermissions.hasPermissions(this, perms)) {
-            Toast.makeText(this, "已获取所需权限", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "App has obtained the required permissions", Toast.LENGTH_SHORT).show();
         } else {
-            EasyPermissions.requestPermissions(this, "必须同意所有的权限才能使用本程序",
+            EasyPermissions.requestPermissions(this, "You should agree all the needed permissions if you want to use this App.",
                     0, perms);
         }
     }
@@ -295,12 +295,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     @Override
     public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
-        Toast.makeText(this, "获取成功的权限" + perms, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Success obtain permissions: " + perms, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPermissionsDenied(int requestCode, @NonNull List<String> perms) {
-        Toast.makeText(this, "获取失败的权限" + perms, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Fail obtain permissions:" + perms, Toast.LENGTH_SHORT).show();
 
         if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
             new AppSettingsDialog.Builder(this).build().show();
@@ -374,15 +374,15 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         BleManager.getInstance().connect(bleDevice, new BleGattCallback() {
             @Override
             public void onStartConnect() {
-                progressDialog.show();
+                progressDialog.setMessage("Connecting");  // 设置BLE连接ProgressDialog提示文本
+                progressDialog.show();  // 显示BLE连接ProgressDialog
             }
 
             @Override
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
                 scanMenuItem.setTitle(getString(R.string.start_scan));
 
-                progressDialog.setMessage("Connecting");  // 设置BLE连接ProgressDialog提示文本
-                progressDialog.dismiss();  // 显示BLE连接ProgressDialog
+                progressDialog.dismiss();  // 隐藏BLE连接ProgressDialog
 
                 bleScanStatus = BLE_SCAN_STATUS;
 
