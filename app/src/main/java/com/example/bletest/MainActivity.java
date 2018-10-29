@@ -381,7 +381,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             public void onConnectFail(BleDevice bleDevice, BleException exception) {
                 scanMenuItem.setTitle(getString(R.string.start_scan));
 
-                progressDialog.dismiss();
+                progressDialog.setMessage("Connecting");  // 设置BLE连接ProgressDialog提示文本
+                progressDialog.dismiss();  // 显示BLE连接ProgressDialog
 
                 bleScanStatus = BLE_SCAN_STATUS;
 
@@ -390,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
-                progressDialog.dismiss();
+                progressDialog.dismiss();  // 隐藏BLE连接ProgressDialog
 
                 mDeviceAdapter.addDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
@@ -402,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             @Override
             public void onDisConnected(boolean isActiveDisConnected, BleDevice device, BluetoothGatt gatt, int status) {
-                progressDialog.dismiss();
+                progressDialog.dismiss();  // 隐藏BLE连接ProgressDialog
 
                 mDeviceAdapter.removeDevice(bleDevice);
                 mDeviceAdapter.notifyDataSetChanged();
