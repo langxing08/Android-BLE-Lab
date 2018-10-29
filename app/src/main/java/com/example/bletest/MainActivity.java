@@ -214,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                // 下拉刷新实现BLE扫描功能
                 bleSetScanRule();
                 bleStartScan();
             }

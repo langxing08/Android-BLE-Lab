@@ -47,7 +47,7 @@ public class OperationActivity extends AppCompatActivity implements Observer {
 
     private android.support.v7.widget.Toolbar toolbar;
     private List<Fragment> fragmentList = new ArrayList<>();
-    private int currentPage = 0;
+    private int currentPage = SERVICE_LIST_PAGE;
     private final String[] titles = {"Service List","Char List","Char Operation"};
 
     @Override
@@ -108,8 +108,10 @@ public class OperationActivity extends AppCompatActivity implements Observer {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_connect_item:
-                Toast.makeText(this, "connect", Toast.LENGTH_SHORT).show();
+            case R.id.action_connect_item:  // 断开BLE连接
+                if (bleDevice != null) {
+                    finish();
+                }
                 break;
             case R.id.action_chat_show_log_item:
                 Toast.makeText(this, "show log", Toast.LENGTH_SHORT).show();
