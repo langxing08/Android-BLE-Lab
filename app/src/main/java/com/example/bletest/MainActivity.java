@@ -385,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
                 bleScanStatus = BLE_SCAN_STATUS;
 
-                Toast.makeText(MainActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Connect failed", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -408,9 +408,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 mDeviceAdapter.notifyDataSetChanged();
 
                 if (isActiveDisConnected) {
-                    Toast.makeText(MainActivity.this, "断开了", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "You disconnect BLE", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MainActivity.this, "连接断开", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "BLE was disconnected", Toast.LENGTH_SHORT).show();
 
                     ObserverManager.getInstance().notifyObserver(bleDevice);
                 }
